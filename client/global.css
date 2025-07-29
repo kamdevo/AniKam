@@ -1,0 +1,220 @@
+@import url("https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * AniShelf - Anime-inspired glassmorphism theme
+   * Purple-blue gradients with cyan accents
+   */
+  :root {
+    /* Background gradients - Light theme: rgb(255, 255, 255) */
+    --background: 0 0% 100%;
+    --background-secondary: 0 0% 98%;
+    --foreground: 235 15% 15%;
+
+    /* Glass cards */
+    --glass: 240 30% 96%;
+    --glass-foreground: 235 15% 20%;
+    --glass-border: 240 20% 80%;
+
+    /* Primary - Purple */
+    --primary: 260 84% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 260 84% 70%;
+
+    /* Secondary - Blue */
+    --secondary: 220 100% 70%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 220 100% 80%;
+
+    /* Accent - Cyan */
+    --accent: 180 100% 70%;
+    --accent-foreground: 235 15% 15%;
+    --accent-light: 180 100% 80%;
+
+    /* Status colors */
+    --success: 140 70% 60%;
+    --warning: 45 100% 65%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Muted colors */
+    --muted: 240 15% 90%;
+    --muted-foreground: 235 15% 45%;
+
+    /* UI elements */
+    --border: 240 20% 85%;
+    --input: 240 20% 90%;
+    --ring: 260 84% 60%;
+    --radius: 0.75rem;
+
+    /* Card variants */
+    --card: 0 0% 100%;
+    --card-foreground: 235 15% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 235 15% 15%;
+  }
+
+  .dark {
+    /* Dark background gradients - Dark theme: rgb(20, 20, 20) */
+    --background: 0 0% 8%;
+    --background-secondary: 0 0% 6%;
+    --foreground: 240 15% 85%;
+
+    /* Dark glass cards */
+    --glass: 240 15% 12%;
+    --glass-foreground: 240 15% 85%;
+    --glass-border: 240 15% 25%;
+
+    /* Primary - Brighter purple for dark mode */
+    --primary: 260 84% 70%;
+    --primary-foreground: 235 25% 8%;
+    --primary-light: 260 84% 80%;
+
+    /* Secondary - Bright blue */
+    --secondary: 220 100% 75%;
+    --secondary-foreground: 235 25% 8%;
+    --secondary-light: 220 100% 85%;
+
+    /* Accent - Bright cyan */
+    --accent: 180 100% 75%;
+    --accent-foreground: 235 25% 8%;
+    --accent-light: 180 100% 85%;
+
+    /* Status colors for dark */
+    --success: 140 70% 65%;
+    --warning: 45 100% 70%;
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 235 25% 8%;
+
+    /* Dark muted */
+    --muted: 240 15% 18%;
+    --muted-foreground: 240 15% 55%;
+
+    /* Dark UI elements */
+    --border: 240 15% 20%;
+    --input: 240 15% 15%;
+    --ring: 260 84% 70%;
+
+    /* Dark cards */
+    --card: 240 15% 10%;
+    --card-foreground: 240 15% 85%;
+    --popover: 240 15% 10%;
+    --popover-foreground: 240 15% 85%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border font-sans;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-background via-background-secondary to-background text-foreground;
+    background-attachment: fixed;
+    font-family:
+      "Lexend Deca",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      "Roboto",
+      "Oxygen",
+      "Ubuntu",
+      "Cantarell",
+      "Fira Sans",
+      "Droid Sans",
+      "Helvetica Neue",
+      sans-serif;
+  }
+
+  /* Glassmorphism utilities */
+  .glass {
+    @apply bg-glass/40 backdrop-blur-md border border-glass-border/30;
+  }
+
+  .glass-card {
+    @apply glass rounded-xl shadow-lg shadow-primary/5;
+  }
+
+  .glass-nav {
+    @apply glass border-b border-glass-border/30 backdrop-blur-xl;
+  }
+
+  /* Gradient text utilities */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+  }
+
+  .gradient-text-subtle {
+    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+  }
+
+  /* Animation utilities */
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+    }
+    to {
+      box-shadow:
+        0 0 30px hsl(var(--primary) / 0.5),
+        0 0 40px hsl(var(--secondary) / 0.3);
+    }
+  }
+
+  /* Scroll animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease-out;
+  }
+
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/30;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/60 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+
+  /* Shimmer animation for skeletons */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+}
