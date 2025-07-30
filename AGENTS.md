@@ -1,163 +1,125 @@
-# Fusion Starter
+# AniKam
 
-A production-ready full-stack React application template with integrated Express server, featuring React Router 6 SPA mode, TypeScript, Vitest, Zod and modern tooling.
+Your ultimate anime and manga companion! AniKam helps you discover amazing new series, keep track of what you're watching and reading, and organize your entire collection in one beautiful, easy-to-use platform.
 
-While the starter comes with a express server, only create endpoint when strictly neccesary, for example to encapsulate logic that must leave in the server, such as private keys handling, or certain DB operations, db...
+Whether you're a seasoned otaku or just getting started with anime and manga, AniKam makes it simple to explore thousands of titles, track your progress, and never lose track of your favorites again.
 
-## Tech Stack
+## What Makes AniKam Special
 
-- **Frontend**: React 18 + React Router 6 (spa) + TypeScript + Vite + TailwindCSS 3
-- **Backend**: Express server integrated with Vite dev server
-- **Testing**: Vitest
-- **UI**: Radix UI + TailwindCSS 3 + Lucide React icons
+- **Beautiful Design**: Modern, sleek interface with smooth animations and glass-like effects
+- **Works Everywhere**: Responsive design that looks great on your phone, tablet, or computer
+- **Rich Content**: Access to thousands of anime and manga titles with detailed information
+- **Personal Library**: Keep track of what you're watching, reading, completed, and planning to watch
+- **Smart Search**: Find exactly what you're looking for with advanced filters and instant search
+- **Always Available**: Works offline with your saved data when you don't have internet
 
-## Project Structure
+## Built with Modern Technology
 
-```
-client/                   # React SPA frontend
-├── pages/                # Route components (Index.tsx = home)
-├── components/ui/        # Pre-built UI component library
-├── App.tsx                # App entry point and with SPA routing setup
-└── global.css            # TailwindCSS 3 theming and global styles
+AniKam is built using the latest web technologies to ensure a fast, reliable, and beautiful experience:
 
-server/                   # Express API backend
-├── index.ts              # Main server setup (express config + routes)
-└── routes/               # API handlers
+- **Modern Interface**: Built with React and beautiful UI components for a smooth, responsive experience
+- **Lightning Fast**: Optimized for speed with instant search and quick page loads
+- **Reliable Data**: Powered by comprehensive anime and manga databases
+- **Cross-Platform**: Works perfectly on desktop, tablet, and mobile devices
+- **Offline Ready**: Your library and preferences are saved locally for offline access
 
-shared/                   # Types used by both client & server
-└── api.ts                # Example of how to share api interfaces
-```
+## What You Can Do with AniKam
 
-## Key Features
+### 🔍 **Discover Amazing Content**
 
-## SPA Routing System
+- **Explore Thousands of Titles**: Browse through a vast collection of anime and manga
+- **Find What's Trending**: See what's popular this season and what everyone's talking about
+- **Smart Recommendations**: Get suggestions based on your preferences and viewing history
+- **Detailed Information**: Read synopses, check ratings, see episode counts, and more
+- **Filter & Search**: Find exactly what you want by genre, year, status, or rating
 
-The routing system is powered by React Router 6:
+### 📚 **Organize Your Collection**
 
-- `client/pages/Index.tsx` represents the home page.
-- Routes are defined in `client/App.tsx` using the `react-router-dom` import
-- Route files are located in the `client/pages/` directory
+- **Track Your Progress**: Mark episodes watched and chapters read
+- **Organize by Status**: Sort your collection into "Watching," "Completed," "Planning to Watch," and more
+- **Rate Your Favorites**: Give ratings to titles you've enjoyed
+- **Never Lose Track**: Your library is always saved and accessible
+- **View Statistics**: See how much you've watched and discover your viewing patterns
 
-For example, routes can be defined with:
+### ✨ **Enjoy a Beautiful Experience**
 
-```typescript
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+- **Stunning Interface**: Clean, modern design that's a pleasure to use
+- **Smooth Animations**: Fluid transitions and delightful interactions
+- **Dark & Light Modes**: Choose the theme that's comfortable for your eyes
+- **Mobile Friendly**: Use AniKam anywhere - on your phone, tablet, or computer
+- **Fast & Reliable**: Quick loading times and works even when you're offline
 
-<Routes>
-  <Route path="/" element={<Index />} />
-  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-  <Route path="*" element={<NotFound />} />
-</Routes>;
-```
+## How to Navigate AniKam
 
-### Styling System
+AniKam is designed to be intuitive and easy to navigate. Here's what you'll find:
 
-- **Primary**: TailwindCSS 3 utility classes
-- **Theme and design tokens**: Configure in `client/global.css` 
-- **UI components**: Pre-built library in `client/components/ui/`
-- **Utility**: `cn()` function combines `clsx` + `tailwind-merge` for conditional classes
+### 🏠 **Homepage**
 
-```typescript
-// cn utility usage
-className={cn(
-  "base-classes",
-  { "conditional-class": condition },
-  props.className  // User overrides
-)}
-```
+Your starting point featuring trending anime, seasonal highlights, and quick access to all major features. Get inspired by what's popular and discover your next favorite series.
 
-### Express Server Integration
+### 🔍 **Catalog**
 
-- **Development**: Single port (8080) for both frontend/backend
-- **Hot reload**: Both client and server code
-- **API endpoints**: Prefixed with `/api/`
+The heart of discovery! Browse through thousands of anime and manga titles. Use filters to find exactly what you're looking for - whether it's a specific genre, year, or rating.
 
-#### Example API Routes
-- `GET /api/ping` - Simple ping api
-- `GET /api/demo` - Demo endpoint  
+### 📚 **Your Library**
 
-### Shared Types
-Import consistent types in both client and server:
-```typescript
-import { DemoResponse } from '@shared/api';
-```
+Your personal collection where you can see everything you're watching, have completed, or plan to watch. Track your progress and manage your anime/manga journey.
 
-Path aliases:
-- `@shared/*` - Shared folder
-- `@/*` - Client folder
+### 📖 **Title Details**
 
-## Development Commands
+Click on any anime or manga to see detailed information including synopsis, ratings, episode/chapter counts, and where you can watch or read it.
 
-```bash
-npm run dev        # Start dev server (client + server)
-npm run build      # Production build
-npm run start      # Start production server
-npm run typecheck  # TypeScript validation
-npm test          # Run Vitest tests
-```
+### 🧭 **Easy Navigation**
 
-## Adding Features
+- Clean, intuitive menu that works on all devices
+- Search functionality available from anywhere
+- Quick access to your most-used features
+- Smooth transitions between pages
 
-### Add new colors to the theme
+## Getting Started with AniKam
 
-Open `client/global.css` and `tailwind.config.ts` and add new tailwind colors.
+Ready to dive into the world of anime and manga? Here's how to get started:
 
-### New API Route
-1. **Optional**: Create a shared interface in `shared/api.ts`:
-```typescript
-export interface MyRouteResponse {
-  message: string;
-  // Add other response properties here
-}
-```
+### 🚀 **First Steps**
 
-2. Create a new route handler in `server/routes/my-route.ts`:
-```typescript
-import { RequestHandler } from "express";
-import { MyRouteResponse } from "@shared/api"; // Optional: for type safety
+1. **Explore the Homepage**: Check out trending anime and seasonal highlights
+2. **Browse the Catalog**: Use the search and filters to find something that interests you
+3. **Start Your Library**: Add titles to your "Planning to Watch" or "Currently Watching" lists
+4. **Track Your Progress**: Mark episodes as watched and rate the series you enjoy
+5. **Discover More**: Use recommendations and trending lists to find your next favorite
 
-export const handleMyRoute: RequestHandler = (req, res) => {
-  const response: MyRouteResponse = {
-    message: 'Hello from my endpoint!'
-  };
-  res.json(response);
-};
-```
+### 💡 **Pro Tips**
 
-3. Register the route in `server/index.ts`:
-```typescript
-import { handleMyRoute } from "./routes/my-route";
+- **Use Filters**: Narrow down your search by genre, year, rating, or status to find exactly what you want
+- **Check Seasonal Anime**: Stay up-to-date with what's currently airing
+- **Rate Everything**: Your ratings help improve future recommendations
+- **Organize Your Library**: Use different status categories to keep track of your viewing journey
+- **Works Offline**: Your library and progress are saved locally, so you can access them anytime
 
-// Add to the createServer function:
-app.get("/api/my-endpoint", handleMyRoute);
-```
+### 🎯 **Perfect For**
 
-4. Use in React components with type safety:
-```typescript
-import { MyRouteResponse } from '@shared/api'; // Optional: for type safety
+- **New Anime Fans**: Discover popular series and classics to get started
+- **Seasoned Otaku**: Keep track of your extensive collection and find hidden gems
+- **Casual Viewers**: Simple way to remember what you've watched and what's next
+- **Manga Readers**: Track your reading progress alongside your anime watching
+- **Anyone**: Who wants a beautiful, organized way to manage their entertainment
 
-const response = await fetch('/api/my-endpoint');
-const data: MyRouteResponse = await response.json();
-```
+## Why Choose AniKam?
 
-### New Page Route
-1. Create component in `client/pages/MyPage.tsx`
-2. Add route in `client/App.tsx`:
-```typescript
-<Route path="/my-page" element={<MyPage />} />
-```
+### 🌟 **Built for Anime & Manga Fans**
 
-## Production Deployment
+AniKam isn't just another generic app - it's specifically designed for the anime and manga community. Every feature, from the beautiful anime-inspired design to the comprehensive tracking system, is crafted with otaku in mind.
 
-- **Standard**: `npm run build` + `npm start`
-- **Binary**: Self-contained executables (Linux, macOS, Windows)
-- Prefer to use netlify (recomend the MCP) to deploy the site, do not use other providers as netlify is already preconfigured.
+### 🚀 **Always Improving**
 
-## Architecture Notes
+AniKam is continuously updated with new features and improvements based on user feedback. The app grows with the community, ensuring you always have the best tools for managing your anime and manga journey.
 
-- Single-port development with Vite + Express integration
-- TypeScript throughout (client, server, shared)
-- Full hot reload for rapid development
-- Production-ready with multiple deployment options
-- Comprehensive UI component library included
-- Type-safe API communication via shared interfaces
+### 💝 **Free & Accessible**
+
+AniKam is completely free to use and works on all your devices. Whether you're at home on your computer or on the go with your phone, your anime library is always with you.
+
+---
+
+**Ready to organize your anime and manga collection like never before? Start your journey with AniKam today!**
+
+_Built with ❤️ for the anime and manga community_
