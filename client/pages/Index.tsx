@@ -1,21 +1,34 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Play, BookOpen, TrendingUp, Star, ArrowRight, Loader2 } from 'lucide-react';
-import { GlassCard } from '@/components/ui/glass-card';
-import { AnimeCard } from '@/components/ui/anime-card';
-import { AnimeCardGridSkeleton } from '@/components/ui/anime-card-skeleton';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { AuthModal } from '@/components/auth-modal';
-import { useTopAnime, useCurrentSeason } from '@/hooks/use-anime-data';
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Play,
+  BookOpen,
+  TrendingUp,
+  Star,
+  ArrowRight,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
+import { GlassCard } from "@/components/ui/glass-card";
+import { AnimeCard } from "@/components/ui/anime-card";
+import { AnimeCardGridSkeleton } from "@/components/ui/anime-card-skeleton";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { AuthModal } from "@/components/auth-modal";
+import { useAuth } from "@/contexts/auth-context";
+import { useTopAnime, useCurrentSeason } from "@/hooks/use-anime-data";
 
 export default function Index() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const parallaxRef = useRef<HTMLDivElement>(null);
-  const { data: currentSeasonAnime, loading: seasonLoading } = useCurrentSeason();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+
+  const { data: currentSeasonAnime, loading: seasonLoading } =
+    useCurrentSeason();
   const { data: topAnime, loading: topLoading } = useTopAnime({
-    filter: 'bypopularity',
-    limit: 8
+    filter: "bypopularity",
+    limit: 8,
   });
 
   // Initialize parallax effect
@@ -25,17 +38,17 @@ export default function Index() {
     const initParallax = async () => {
       if (parallaxRef.current) {
         try {
-          const SimpleParallax = await import('simple-parallax-js');
+          const SimpleParallax = await import("simple-parallax-js");
           const ParallaxConstructor = SimpleParallax.default || SimpleParallax;
 
           parallaxInstance = new ParallaxConstructor(parallaxRef.current, {
             delay: 0.6,
-            transition: 'cubic-bezier(0,0,0,1)',
-            direction: 'up',
-            scale: 1.3
+            transition: "cubic-bezier(0,0,0,1)",
+            direction: "up",
+            scale: 1.3,
           });
         } catch (error) {
-          console.warn('SimpleParallax initialization failed:', error);
+          console.warn("SimpleParallax initialization failed:", error);
         }
       }
     };
@@ -44,10 +57,10 @@ export default function Index() {
 
     // Cleanup function
     return () => {
-      if (parallaxInstance && typeof parallaxInstance.destroy === 'function') {
+      if (parallaxInstance && typeof parallaxInstance.destroy === "function") {
         parallaxInstance.destroy();
       } else if (parallaxRef.current) {
-        parallaxRef.current.style.transform = '';
+        parallaxRef.current.style.transform = "";
       }
     };
   }, []);
@@ -55,9 +68,25 @@ export default function Index() {
   const featuredAnime = currentSeasonAnime.slice(0, 6);
   const trendingAnime = topAnime.slice(0, 8);
 
+  const handleExploreClick = () => {
+    if (isAuthenticated) {
+      navigate("/catalog");
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
+
+  const handleLibraryClick = () => {
+    if (isAuthenticated) {
+      navigate("/library");
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
+
   const handleAuthSuccess = () => {
-    // Redirect to catalog after successful authentication
-    window.location.href = '/catalog';
+    setIsAuthModalOpen(false);
+    navigate("/catalog");
   };
 
   return (
@@ -77,15 +106,38 @@ export default function Index() {
         <div className="relative container mx-auto px-4 py-20 z-10">
           <div className="text-center space-y-8 max-w-4xl mx-auto">
             {/* Main heading */}
+            {/* Welcome message for authenticated users */}
+            {isAuthenticated && user && (
+              <div className="mb-8 animate-fade-in">
+                <GlassCard className="inline-block px-6 py-3 backdrop-blur-xl bg-background/30 border-white/20">
+                  <div className="flex items-center gap-2 text-lg">
+                    <span>Welcome back, </span>
+                    <span className="font-semibold gradient-text">
+                      {user.username}
+                    </span>
+                    {user.isDemo && (
+                      <Badge variant="secondary" className="ml-2">
+                        <Sparkles className="w-3 h-3 mr-1" />
+                        Demo
+                      </Badge>
+                    )}
+                  </div>
+                </GlassCard>
+              </div>
+            )}
+
             <div className="space-y-4 animate-fade-in">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold drop-shadow-lg leading-tight">
                 <span className="gradient-text">Your Ultimate</span>
                 <br />
-                <span className="text-foreground drop-shadow-md">Anime Library</span>
+                <span className="text-foreground drop-shadow-md">
+                  Anime Library
+                </span>
               </h1>
               <p className="text-lg sm:text-xl md:text-2xl text-foreground/90 max-w-2xl mx-auto drop-shadow-md px-4 sm:px-0">
-                Discover, track, and organize your anime and manga collection with style.
-                Join thousands of otaku in building the perfect digital library.
+                Discover, track, and organize your anime and manga collection
+                with style. Join thousands of otaku in building the perfect
+                digital library.
               </p>
             </div>
 
@@ -94,32 +146,47 @@ export default function Index() {
               <Button
                 size="lg"
                 className="bg-anime-gradient hover:opacity-90 text-white font-semibold px-8"
-                onClick={() => setIsAuthModalOpen(true)}
+                onClick={handleExploreClick}
               >
                 <Play className="w-5 h-5 mr-2" />
-                Explore Catalog
+                {isAuthenticated ? "Explore Catalog" : "Get Started"}
               </Button>
-              <Button size="lg" variant="outline" className="border-primary/20 hover:bg-primary/5" asChild>
-                <Link to="/library">
-                  <BookOpen className="w-5 h-5 mr-2" />
-                  My Library
-                </Link>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-primary/20 hover:bg-primary/5"
+                onClick={handleLibraryClick}
+              >
+                <BookOpen className="w-5 h-5 mr-2" />
+                My Library
               </Button>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-12 sm:mt-16 animate-fade-in-up px-4 sm:px-0">
               <GlassCard className="text-center p-4 sm:p-6 backdrop-blur-xl bg-background/30 border-white/20">
-                <div className="text-2xl sm:text-3xl font-bold gradient-text-subtle">10K+</div>
-                <div className="text-sm sm:text-base text-foreground/80">Anime & Manga</div>
+                <div className="text-2xl sm:text-3xl font-bold gradient-text-subtle">
+                  10K+
+                </div>
+                <div className="text-sm sm:text-base text-foreground/80">
+                  Anime & Manga
+                </div>
               </GlassCard>
               <GlassCard className="text-center p-4 sm:p-6 backdrop-blur-xl bg-background/30 border-white/20">
-                <div className="text-2xl sm:text-3xl font-bold gradient-text-subtle">500K+</div>
-                <div className="text-sm sm:text-base text-foreground/80">Happy Users</div>
+                <div className="text-2xl sm:text-3xl font-bold gradient-text-subtle">
+                  500K+
+                </div>
+                <div className="text-sm sm:text-base text-foreground/80">
+                  Happy Users
+                </div>
               </GlassCard>
               <GlassCard className="text-center p-4 sm:p-6 backdrop-blur-xl bg-background/30 border-white/20">
-                <div className="text-2xl sm:text-3xl font-bold gradient-text-subtle">1M+</div>
-                <div className="text-sm sm:text-base text-foreground/80">Reviews</div>
+                <div className="text-2xl sm:text-3xl font-bold gradient-text-subtle">
+                  1M+
+                </div>
+                <div className="text-sm sm:text-base text-foreground/80">
+                  Reviews
+                </div>
               </GlassCard>
             </div>
           </div>
@@ -131,8 +198,12 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold mb-2">Featured This Season</h2>
-              <p className="text-sm sm:text-base text-muted-foreground">Hand-picked anime and manga you shouldn't miss</p>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+                Featured This Season
+              </h2>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Hand-picked anime and manga you shouldn't miss
+              </p>
             </div>
             <Link to="/catalog">
               <Button variant="ghost" className="group w-full sm:w-auto">
@@ -149,8 +220,9 @@ export default function Index() {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
               {featuredAnime
-                .filter((anime, index, arr) =>
-                  arr.findIndex(item => item.id === anime.id) === index
+                .filter(
+                  (anime, index, arr) =>
+                    arr.findIndex((item) => item.id === anime.id) === index
                 )
                 .map((anime, index) => (
                   <AnimeCard
@@ -159,8 +231,7 @@ export default function Index() {
                     className="animate-scale-in"
                     style={{ animationDelay: `${index * 100}ms` }}
                   />
-                ))
-              }
+                ))}
             </div>
           )}
         </div>
@@ -174,7 +245,9 @@ export default function Index() {
               <TrendingUp className="w-8 h-8 text-primary" />
               <div>
                 <h2 className="text-3xl font-bold">Trending Now</h2>
-                <p className="text-muted-foreground">Most popular anime and manga this week</p>
+                <p className="text-muted-foreground">
+                  Most popular anime and manga this week
+                </p>
               </div>
             </div>
             <Badge variant="secondary" className="bg-primary/10 text-primary">
@@ -190,8 +263,9 @@ export default function Index() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
               {trendingAnime
-                .filter((anime, index, arr) =>
-                  arr.findIndex(item => item.id === anime.id) === index
+                .filter(
+                  (anime, index, arr) =>
+                    arr.findIndex((item) => item.id === anime.id) === index
                 )
                 .map((anime, index) => (
                   <Link
@@ -199,40 +273,44 @@ export default function Index() {
                     to={`/anime/${anime.id}`}
                     className="block"
                   >
-                  <GlassCard
-                    variant="hover"
-                    className="relative group cursor-pointer animate-fade-in"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <div className="aspect-[3/4] relative overflow-hidden rounded-lg">
-                      <img
-                        src={anime.coverImage}
-                        alt={anime.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="absolute bottom-2 left-2 right-2">
-                          <h3 className="text-white text-sm font-medium line-clamp-2">
-                            {anime.title}
-                          </h3>
+                    <GlassCard
+                      variant="hover"
+                      className="relative group cursor-pointer animate-fade-in"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="aspect-[3/4] relative overflow-hidden rounded-lg">
+                        <img
+                          src={anime.coverImage}
+                          alt={anime.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="absolute bottom-2 left-2 right-2">
+                            <h3 className="text-white text-sm font-medium line-clamp-2">
+                              {anime.title}
+                            </h3>
+                          </div>
+                        </div>
+                        <div className="absolute top-2 left-2">
+                          <Badge
+                            variant="secondary"
+                            className="text-xs bg-primary text-white"
+                          >
+                            #{anime.popularity}
+                          </Badge>
+                        </div>
+                        <div className="absolute top-2 right-2">
+                          <div className="flex items-center gap-1 bg-black/60 backdrop-blur-sm rounded-full px-2 py-1">
+                            <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            <span className="text-xs text-white">
+                              {anime.rating}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <div className="absolute top-2 left-2">
-                        <Badge variant="secondary" className="text-xs bg-primary text-white">
-                          #{anime.popularity}
-                        </Badge>
-                      </div>
-                      <div className="absolute top-2 right-2">
-                        <div className="flex items-center gap-1 bg-black/60 backdrop-blur-sm rounded-full px-2 py-1">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-xs text-white">{anime.rating}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </GlassCard>
-                </Link>
-                ))
-              }
+                    </GlassCard>
+                  </Link>
+                ))}
             </div>
           )}
         </div>
@@ -241,41 +319,55 @@ export default function Index() {
       {/* Quick Actions */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Start Your Journey</h2>
-          
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Start Your Journey
+          </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Link to="/catalog" className="group">
-              <GlassCard variant="hover" className="p-8 text-center space-y-4 h-full">
+              <GlassCard
+                variant="hover"
+                className="p-8 text-center space-y-4 h-full"
+              >
                 <div className="w-16 h-16 bg-anime-gradient rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                   <Play className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold">Discover New Anime</h3>
                 <p className="text-muted-foreground">
-                  Explore thousands of anime and manga with advanced filters and recommendations
+                  Explore thousands of anime and manga with advanced filters and
+                  recommendations
                 </p>
               </GlassCard>
             </Link>
 
             <Link to="/library" className="group">
-              <GlassCard variant="hover" className="p-8 text-center space-y-4 h-full">
+              <GlassCard
+                variant="hover"
+                className="p-8 text-center space-y-4 h-full"
+              >
                 <div className="w-16 h-16 bg-gradient-to-r from-secondary to-accent rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                   <BookOpen className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold">Build Your Library</h3>
                 <p className="text-muted-foreground">
-                  Organize your collection, track progress, and never lose track of what you're watching
+                  Organize your collection, track progress, and never lose track
+                  of what you're watching
                 </p>
               </GlassCard>
             </Link>
 
             <div className="group">
-              <GlassCard variant="hover" className="p-8 text-center space-y-4 h-full">
+              <GlassCard
+                variant="hover"
+                className="p-8 text-center space-y-4 h-full"
+              >
                 <div className="w-16 h-16 bg-gradient-to-r from-accent to-primary rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                   <Star className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold">Rate & Review</h3>
                 <p className="text-muted-foreground">
-                  Share your thoughts and discover what the community thinks about your favorites
+                  Share your thoughts and discover what the community thinks
+                  about your favorites
                 </p>
               </GlassCard>
             </div>

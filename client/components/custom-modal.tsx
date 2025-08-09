@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface CustomModalProps {
   isOpen: boolean;
@@ -11,53 +10,70 @@ interface CustomModalProps {
   className?: string;
 }
 
-export function CustomModal({ isOpen, onClose, children, className }: CustomModalProps) {
+export function CustomModal({
+  isOpen,
+  onClose,
+  children,
+  className,
+}: CustomModalProps) {
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Overlay */}
-      <div 
-        className="absolute inset-0 bg-black/70 backdrop-blur-md animate-fade-in"
-        onClick={onClose}
-      />
-      
-      {/* Modal Content */}
-      <div className={cn(
-        "relative max-w-md w-full animate-scale-in",
-        className
-      )}>
-        {children}
-      </div>
-    </div>,
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 bg-black/70 backdrop-blur-md"
+            onClick={onClose}
+          />
+
+          {/* Modal Content */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className={cn(
+              "relative max-w-md w-full max-h-[90vh] overflow-auto",
+              className
+            )}
+          >
+            {children}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 }

@@ -1,10 +1,21 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Library, Compass, Home, Moon, Sun, Menu, User } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { AuthModal } from './auth-modal';
-import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Search,
+  Library,
+  Compass,
+  Home,
+  Moon,
+  Sun,
+  Menu,
+  User,
+} from "lucide-react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { AuthModal } from "./auth-modal";
+import { UserProfile } from "./user-profile";
+import { useAuth } from "@/contexts/auth-context";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface NavigationProps {
   onSearch?: (query: string) => void;
@@ -12,18 +23,23 @@ interface NavigationProps {
   onThemeToggle?: () => void;
 }
 
-export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps) {
+export function Navigation({
+  onSearch,
+  isDark,
+  onThemeToggle,
+}: NavigationProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // TODO: Replace with actual auth state
+
+  const { isAuthenticated, user } = useAuth();
 
   const navItems = [
-    { href: '/', label: 'Home', icon: Home },
-    { href: '/catalog', label: 'Catalog', icon: Compass },
-    { href: '/library', label: 'Library', icon: Library },
+    { href: "/", label: "Home", icon: Home },
+    { href: "/catalog", label: "Catalog", icon: Compass },
+    { href: "/library", label: "Library", icon: Library },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
@@ -36,7 +52,7 @@ export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps)
   };
 
   const handleAuthSuccess = () => {
-    setIsLoggedIn(true);
+    setIsAuthModalOpen(false);
   };
 
   return (
@@ -44,10 +60,7 @@ export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps)
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link 
-            to="/" 
-            className="flex items-center space-x-2 group"
-          >
+          <Link to="/" className="flex items-center space-x-2 group">
             <div className="w-8 h-8 bg-anime-gradient rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
               <span className="text-white font-bold text-lg">🧩</span>
             </div>
@@ -61,10 +74,10 @@ export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps)
                 key={href}
                 to={href}
                 className={cn(
-                  'flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-white/10',
+                  "flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 hover:bg-white/10",
                   location.pathname === href
-                    ? 'text-primary bg-primary/10 font-medium'
-                    : 'text-foreground/80 hover:text-foreground'
+                    ? "text-primary bg-primary/10 font-medium"
+                    : "text-foreground/80 hover:text-foreground"
                 )}
               >
                 <Icon className="w-4 h-4" />
@@ -92,7 +105,7 @@ export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps)
           {/* Theme Toggle, Auth & Mobile Menu */}
           <div className="flex items-center space-x-2">
             {/* Login/Profile Button */}
-            {!isLoggedIn ? (
+            {!isAuthenticated ? (
               <Button
                 variant="outline"
                 size="sm"
@@ -103,13 +116,9 @@ export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps)
                 Sign In
               </Button>
             ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hidden md:flex w-9 h-9 p-0 hover:bg-white/10"
-              >
-                <User className="w-4 h-4" />
-              </Button>
+              <div className="hidden md:block">
+                <UserProfile />
+              </div>
             )}
 
             <Button
@@ -118,7 +127,11 @@ export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps)
               onClick={onThemeToggle}
               className="w-9 h-9 p-0 hover:bg-white/10"
             >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {isDark ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
             </Button>
 
             <Button
@@ -156,10 +169,10 @@ export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps)
                 to={href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200',
+                  "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200",
                   location.pathname === href
-                    ? 'text-primary bg-primary/10 font-medium'
-                    : 'text-foreground/80 hover:text-foreground hover:bg-white/10'
+                    ? "text-primary bg-primary/10 font-medium"
+                    : "text-foreground/80 hover:text-foreground hover:bg-white/10"
                 )}
               >
                 <Icon className="w-5 h-5" />
@@ -168,7 +181,7 @@ export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps)
             ))}
 
             {/* Mobile Auth Button */}
-            {!isLoggedIn && (
+            {!isAuthenticated ? (
               <Button
                 onClick={() => {
                   setIsAuthModalOpen(true);
@@ -179,6 +192,25 @@ export function Navigation({ onSearch, isDark, onThemeToggle }: NavigationProps)
                 <User className="w-5 h-5 mr-2" />
                 Sign In
               </Button>
+            ) : (
+              <div className="px-4 py-3 border-t border-glass-border/50 mt-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-anime-gradient rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold">
+                      {user?.avatar || user?.username?.[0]?.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{user?.username}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <UserProfile />
+                </div>
+              </div>
             )}
           </div>
         )}
