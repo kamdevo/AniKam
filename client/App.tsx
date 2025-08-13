@@ -50,37 +50,12 @@ function App() {
           <main>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route
-                path="/catalog"
-                element={
-                  <ProtectedRoute>
-                    <Catalog />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/library"
-                element={
-                  <ProtectedRoute>
-                    <Library />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/anime/:id"
-                element={
-                  <ProtectedRoute>
-                    <AnimeDetails />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/catalog" element={<Catalog />} />
+              <Route path="/library" element={<Library />} />
+              <Route path="/anime/:id" element={<AnimeDetails />} />
               <Route
                 path="/manga/:id"
-                element={
-                  <ProtectedRoute>
-                    <AnimeDetails type="manga" />
-                  </ProtectedRoute>
-                }
+                element={<AnimeDetails type="manga" />}
               />
               <Route path="*" element={<NotFound />} />
             </Routes>

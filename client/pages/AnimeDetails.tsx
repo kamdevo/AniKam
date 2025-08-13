@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GlassCard } from "@/components/ui/glass-card";
 import { AnimeDetailsSkeleton } from "@/components/ui/anime-details-skeleton";
+import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
 import {
   Select,
   SelectContent,
@@ -31,6 +32,7 @@ import { AnimeMedia, UserStatus, getUserStatusLabel } from "@shared/anime";
 import { useAnimeDetails } from "@/hooks/use-anime-data";
 import { LibraryStorage } from "@/lib/library-storage";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface AnimeDetailsProps {
   type?: "anime" | "manga";
@@ -57,6 +59,9 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
     if (anime) {
       LibraryStorage.addToLibrary(anime, selectedStatus);
       setIsInLibrary(true);
+      toast.success(
+        `Added to library as ${getUserStatusLabel(selectedStatus)}`
+      );
     }
   };
 
@@ -65,6 +70,7 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
       LibraryStorage.updateStatus(anime.id, newStatus);
       setSelectedStatus(newStatus);
       setIsInLibrary(true);
+      toast.success(`Status updated to ${getUserStatusLabel(newStatus)}`);
     }
   };
 
@@ -73,6 +79,7 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
       LibraryStorage.removeFromLibrary(anime.id);
       setIsInLibrary(false);
       setSelectedStatus("planning");
+      toast.success("Removed from library");
     }
   };
 
@@ -219,65 +226,84 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
                 </div>
 
                 {/* Library Actions */}
-                <div className="flex flex-wrap gap-4">
-                  {!isInLibrary ? (
-                    <>
-                      <Select
-                        value={selectedStatus}
-                        onValueChange={(value) =>
-                          setSelectedStatus(value as UserStatus)
-                        }
-                      >
-                        <SelectTrigger className="w-40 bg-glass/50 border-white/30 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="watching">Watching</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="paused">On Hold</SelectItem>
-                          <SelectItem value="planning">
-                            Plan to Watch
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        onClick={handleAddToLibrary}
-                        className="bg-anime-gradient hover:opacity-90 text-white"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add to Library
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Select
-                        value={selectedStatus}
-                        onValueChange={(value) =>
-                          handleUpdateStatus(value as UserStatus)
-                        }
-                      >
-                        <SelectTrigger className="w-40 bg-glass/50 border-white/30 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="watching">Watching</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="paused">On Hold</SelectItem>
-                          <SelectItem value="planning">
-                            Plan to Watch
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="outline"
-                        onClick={handleRemoveFromLibrary}
-                        className="border-white/30 text-white hover:bg-white/10"
-                      >
-                        Remove from Library
-                      </Button>
-                    </>
+                <AuthRequiredWrapper onSuccess={() => {}}>
+                  {({ executeAction, isAuthenticated }) => (
+                    <div className="flex flex-wrap gap-4">
+                      {!isInLibrary ? (
+                        <>
+                          <Select
+                            value={selectedStatus}
+                            onValueChange={(value) =>
+                              setSelectedStatus(value as UserStatus)
+                            }
+                          >
+                            <SelectTrigger className="w-40 bg-glass/50 border-white/30 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="watching">Watching</SelectItem>
+                              <SelectItem value="completed">
+                                Completed
+                              </SelectItem>
+                              <SelectItem value="paused">On Hold</SelectItem>
+                              <SelectItem value="planning">
+                                Plan to Watch
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            onClick={() => {
+                              if (isAuthenticated) {
+                                handleAddToLibrary();
+                              } else {
+                                executeAction(handleAddToLibrary);
+                              }
+                            }}
+                            className="bg-anime-gradient hover:opacity-90 text-white"
+                            title={
+                              !isAuthenticated
+                                ? "Sign in to add to library"
+                                : "Add to library"
+                            }
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add to Library
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Select
+                            value={selectedStatus}
+                            onValueChange={(value) =>
+                              handleUpdateStatus(value as UserStatus)
+                            }
+                          >
+                            <SelectTrigger className="w-40 bg-glass/50 border-white/30 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="watching">Watching</SelectItem>
+                              <SelectItem value="completed">
+                                Completed
+                              </SelectItem>
+                              <SelectItem value="paused">On Hold</SelectItem>
+                              <SelectItem value="planning">
+                                Plan to Watch
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            variant="outline"
+                            onClick={handleRemoveFromLibrary}
+                            className="border-white/30 text-white hover:bg-white/10"
+                          >
+                            Remove from Library
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   )}
-                </div>
+                </AuthRequiredWrapper>
               </div>
             </div>
           </div>
