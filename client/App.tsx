@@ -11,6 +11,12 @@ import Catalog from "./pages/Catalog";
 import Library from "./pages/Library";
 import AnimeDetails from "./pages/AnimeDetails";
 import NotFound from "./pages/NotFound";
+import Tracker from "@openreplay/tracker";
+
+const tracker = new Tracker({
+  projectKey: "Oa7Tm6o3GOFjRutwamQS",
+});
+tracker.start();
 
 function App() {
   const [isDark, setIsDark] = useState(() => {
