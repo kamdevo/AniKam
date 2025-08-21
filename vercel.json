@@ -7,6 +7,10 @@
             "config": {
                 "distDir": "dist/spa"
             }
+        },
+        {
+            "src": "api/index.js",
+            "use": "@vercel/node"
         }
     ],
     "routes": [
@@ -18,10 +22,5 @@
             "src": "/(.*)",
             "dest": "/dist/spa/$1"
         }
-    ],
-    "functions": {
-        "api/index.js": {
-            "runtime": "nodejs18.x"
-        }
-    }
+    ]
 }
