@@ -17,7 +17,15 @@ export function createServer() {
     res.json({ message: ping });
   });
 
+  app.get('/api/hello', (req, res) => {
+    res.json({ message: 'Hello from backend!' });
+  });
+
   app.get("/api/demo", handleDemo);
 
   return app;
 }
+
+// For Vercel serverless functions
+const app = createServer();
+export default app;

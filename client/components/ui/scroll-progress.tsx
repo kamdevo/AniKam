@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Progress } from './progress';
+import { useState, useEffect } from "react";
+import { Progress } from "./progress";
 
 export function ScrollProgress() {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -9,26 +9,27 @@ export function ScrollProgress() {
       const scrollHeight = document.documentElement.scrollHeight;
       const clientHeight = document.documentElement.clientHeight;
       const scrollTop = document.documentElement.scrollTop;
-      
+
       const maxScroll = scrollHeight - clientHeight;
       const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
-      
+
       setScrollProgress(progress);
     };
 
-    window.addEventListener('scroll', updateScrollProgress);
+    window.addEventListener("scroll", updateScrollProgress);
     updateScrollProgress(); // Initial calculation
 
-    return () => window.removeEventListener('scroll', updateScrollProgress);
+    return () => window.removeEventListener("scroll", updateScrollProgress);
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-background/20 backdrop-blur-sm">
+    <div className="fixed top-16 left-0 right-0 z-40 h-1 bg-background/20 backdrop-blur-sm">
       <div
         className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 transition-all duration-300 ease-out relative"
         style={{
           width: `${scrollProgress}%`,
-          boxShadow: scrollProgress > 0 ? '0 0 10px rgba(124, 58, 237, 0.5)' : 'none'
+          boxShadow:
+            scrollProgress > 0 ? "0 0 10px rgba(124, 58, 237, 0.5)" : "none",
         }}
       >
         {/* Glowing effect */}

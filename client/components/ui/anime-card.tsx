@@ -66,13 +66,13 @@ export function AnimeCard({
           <GlassCard
             variant="hover"
             className={cn(
-              "group relative overflow-hidden cursor-pointer",
+              "group relative overflow-hidden cursor-pointer h-[420px] flex flex-col",
               className
             )}
             onClick={handleCardClick}
           >
             {/* Cover Image */}
-            <div className="relative aspect-[3/4] overflow-hidden">
+            <div className="relative h-[280px] overflow-hidden flex-shrink-0">
               <img
                 src={anime.coverImage}
                 alt={anime.title}
@@ -137,112 +137,71 @@ export function AnimeCard({
             </div>
 
             {/* Content */}
-            <div className="p-2 sm:p-3 md:p-4 space-y-1 sm:space-y-2">
-              <div>
-                <h3 className="font-semibold text-xs sm:text-sm line-clamp-2 group-hover:text-primary transition-colors">
-                  {anime.title}
-                </h3>
-                {anime.titleEnglish && anime.titleEnglish !== anime.title && (
-                  <p className="text-xs text-muted-foreground line-clamp-1 hidden sm:block">
-                    {anime.titleEnglish}
-                  </p>
-                )}
-              </div>
+            <div className="p-3 flex-1 flex flex-col justify-between min-h-0">
+              <div className="space-y-2">
+                <div>
+                  <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                    {anime.title}
+                  </h3>
+                  {anime.titleEnglish && anime.titleEnglish !== anime.title && (
+                    <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                      {anime.titleEnglish}
+                    </p>
+                  )}
+                </div>
 
-              <div className="flex-wrap gap-1 hidden sm:flex">
-                {anime.genres.slice(0, 2).map((genre) => (
-                  <Badge
-                    key={genre}
-                    variant="outline"
-                    className="text-xs px-1.5 sm:px-2 py-0.5 border-primary/20 text-primary/80"
-                  >
-                    {genre}
-                  </Badge>
-                ))}
-                {anime.genres.length > 2 && (
-                  <Badge
-                    variant="outline"
-                    className="text-xs px-1.5 sm:px-2 py-0.5 border-muted text-muted-foreground"
-                  >
-                    +{anime.genres.length - 2}
-                  </Badge>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{anime.releaseYear}</span>
-                <span>
-                  {anime.episodes
-                    ? `${anime.episodes} eps`
-                    : `${anime.chapters} ch`}
-                </span>
-              </div>
-
-              {/* Progress bar for user's current status */}
-              {(libraryItem?.userStatus === "watching" ||
-                libraryItem?.userStatus === "reading" ||
-                anime.userStatus === "watching" ||
-                anime.userStatus === "reading") &&
-                (libraryItem?.userProgress || anime.userProgress) && (
-                  <div className="space-y-1">
-                    <div className="w-full bg-muted rounded-full h-1.5">
-                      <div
-                        className="bg-gradient-to-r from-primary to-secondary h-1.5 rounded-full transition-all duration-300"
-                        style={{
-                          width: `${((libraryItem?.userProgress || anime.userProgress || 0) / (anime.episodes || anime.chapters || 1)) * 100}%`,
-                        }}
-                      />
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {libraryItem?.userProgress || anime.userProgress} /{" "}
-                      {anime.episodes || anime.chapters}
-                    </div>
-                  </div>
-                )}
-
-              {/* Quick status change buttons */}
-              <div className="gap-0.5 sm:gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex">
-                {(anime.type === "anime"
-                  ? ["watching", "completed", "paused", "planning"]
-                  : ["reading", "completed", "paused", "planning"]
-                ).map((status) => {
-                  const needsAuth = !isAuthenticated && !isInLibrary;
-
-                  return (
-                    <Button
-                      key={status}
-                      size="sm"
-                      variant={
-                        (libraryItem?.userStatus || anime.userStatus) === status
-                          ? "default"
-                          : "ghost"
-                      }
-                      className={cn(
-                        "flex-1 text-xs p-0.5 sm:p-1 h-6 sm:h-7",
-                        needsAuth && "opacity-70"
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStatusChange(status);
-                      }}
-                      title={
-                        needsAuth
-                          ? "Sign in to add to library"
-                          : `Mark as ${status}`
-                      }
+                <div className="flex flex-wrap gap-1">
+                  {anime.genres.slice(0, 2).map((genre) => (
+                    <Badge
+                      key={genre}
+                      variant="outline"
+                      className="text-xs px-2 py-0.5 border-primary/20 text-primary/80"
                     >
-                      {status === "watching" || status === "reading" ? (
-                        <Play className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                      ) : status === "completed" ? (
-                        <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                      ) : status === "paused" ? (
-                        <Heart className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                      ) : (
-                        <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                      )}
-                    </Button>
-                  );
-                })}
+                      {genre}
+                    </Badge>
+                  ))}
+                  {anime.genres.length > 2 && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs px-2 py-0.5 border-muted text-muted-foreground"
+                    >
+                      +{anime.genres.length - 2}
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{anime.releaseYear}</span>
+                  <span>
+                    {anime.episodes
+                      ? `${anime.episodes} eps`
+                      : `${anime.chapters} ch`}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {/* Progress bar for user's current status */}
+                {(libraryItem?.userStatus === "watching" ||
+                  libraryItem?.userStatus === "reading" ||
+                  anime.userStatus === "watching" ||
+                  anime.userStatus === "reading") &&
+                  (libraryItem?.userProgress || anime.userProgress) && (
+                    <div className="space-y-1">
+                      <div className="w-full bg-muted rounded-full h-1.5">
+                        <div
+                          className="bg-gradient-to-r from-primary to-secondary h-1.5 rounded-full transition-all duration-300"
+                          style={{
+                            width: `${((libraryItem?.userProgress || anime.userProgress || 0) / (anime.episodes || anime.chapters || 1)) * 100}%`,
+                          }}
+                        />
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {libraryItem?.userProgress || anime.userProgress} /{" "}
+                        {anime.episodes || anime.chapters}
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
           </GlassCard>

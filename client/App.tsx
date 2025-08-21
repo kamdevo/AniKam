@@ -46,12 +46,12 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background">
-          <ScrollProgress />
           <Navigation
             onSearch={handleSearch}
             isDark={isDark}
             onThemeToggle={handleThemeToggle}
           />
+          <ScrollProgress />
 
           <main>
             <Routes>

@@ -16,7 +16,7 @@ import { UserProfile } from "./user-profile";
 import { useAuth } from "@/contexts/auth-context";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-
+import NavLogo from "../assets/logo.png";
 interface NavigationProps {
   onSearch?: (query: string) => void;
   isDark?: boolean;
@@ -62,7 +62,7 @@ export function Navigation({
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="w-8 h-8 bg-anime-gradient rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span className="text-white font-bold text-lg">🧩</span>
+              <img src={NavLogo} alt="AniKam Logo" />
             </div>
             <span className="gradient-text font-bold text-xl">AniKam</span>
           </Link>

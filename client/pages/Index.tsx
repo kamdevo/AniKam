@@ -214,9 +214,10 @@ export default function Index() {
           </div>
 
           {seasonLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
-              <AnimeCardGridSkeleton count={6} />
-            </div>
+            <AnimeCardGridSkeleton
+              count={6}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6"
+            />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6">
               {featuredAnime
@@ -257,9 +258,11 @@ export default function Index() {
           </div>
 
           {topLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-              <AnimeCardGridSkeleton count={8} />
-            </div>
+            <AnimeCardGridSkeleton
+              count={8}
+              variant="trending"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4"
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
               {trendingAnime
