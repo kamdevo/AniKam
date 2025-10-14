@@ -150,9 +150,14 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   };
 
   const handleSocialAuth = async (provider: "google" | "github") => {
+    console.log("🔵 handleSocialAuth called with provider:", provider);
+    
     try {
+      console.log("🔵 Importing supabase...");
       const { supabase } = await import("@/lib/supabase");
+      console.log("✅ Supabase imported successfully");
       
+      console.log("🔵 Calling signInWithOAuth...");
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: {
@@ -160,14 +165,20 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         },
       });
 
+      console.log("🔵 OAuth response:", { data, error });
+
       if (error) {
+        console.error("❌ OAuth error:", error);
         throw error;
       }
 
+      console.log("✅ OAuth initiated successfully, should redirect now...");
+      console.log("📍 Redirect URL:", data?.url);
+      
       // The user will be redirected to the OAuth provider
       // After authentication, they'll be redirected back to /auth/callback
     } catch (error: any) {
-      console.error(`${provider} auth error:`, error);
+      console.error(`❌ ${provider} auth error:`, error);
       toast.error(`Failed to sign in with ${provider}`);
     }
   };
