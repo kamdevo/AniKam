@@ -57,6 +57,8 @@ Built with modern web technologies, the application offers both online functiona
 
 ### **Data Management**
 
+- **Supabase Authentication**: Secure user authentication with PostgreSQL backend
+- **User Profiles**: Persistent user data with Row Level Security
 - **External API Integration**: Jikan API for comprehensive anime/manga data
 - **Local Storage**: Client-side persistence for user preferences and library
 - **Fallback System**: Graceful degradation when external APIs are unavailable
@@ -85,6 +87,7 @@ Built with modern web technologies, the application offers both online functiona
 
 ### **Backend Technologies**
 
+- **Supabase** - Open source Firebase alternative with PostgreSQL
 - **Node.js** - JavaScript runtime for server-side development
 - **Express.js** - Fast, minimalist web framework
 - **CORS** - Cross-Origin Resource Sharing middleware
@@ -145,9 +148,16 @@ Built with modern web technologies, the application offers both online functiona
 
 ## 🚀 Getting Started
 
+### Quick Start
+
 ```bash
 # Install dependencies
 npm install
+
+# Configure Supabase (see SUPABASE_SETUP_SIMPLE.md)
+# Create .env file with your Supabase credentials
+cp .env.example .env
+# Edit .env and add your VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 
 # Start development server
 npm run dev
@@ -159,7 +169,20 @@ npm run build
 npm test
 ```
 
-The application will be available at `http://localhost:8080`
+The application will be available at `http://localhost:5173`
+
+### Authentication Setup
+
+For detailed instructions on setting up Supabase authentication:
+1. See **[SUPABASE_SETUP_SIMPLE.md](./SUPABASE_SETUP_SIMPLE.md)** for step-by-step guide
+2. Execute **`supabase-setup-simple.sql`** in your Supabase project
+3. Configure environment variables in `.env`
+
+### Demo Account
+
+You can use the demo account without Supabase:
+- **Email**: `demo@anikam.com`
+- **Password**: `demo123`
 
 ---
 

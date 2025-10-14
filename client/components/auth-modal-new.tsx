@@ -151,13 +151,24 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
   const handleSocialAuth = async (provider: "google" | "github") => {
     try {
-      // Simulate social auth
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      toast.success(`Signed in with ${provider}!`);
-      onSuccess?.();
-      onClose();
-    } catch (error) {
-      toast.error("Social authentication failed");
+      const { supabase } = await import("@/lib/supabase");
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // The user will be redirected to the OAuth provider
+      // After authentication, they'll be redirected back to /auth/callback
+    } catch (error: any) {
+      console.error(`${provider} auth error:`, error);
+      toast.error(`Failed to sign in with ${provider}`);
     }
   };
 
