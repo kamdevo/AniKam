@@ -61,20 +61,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
+    console.log("🚀 AuthProvider initializing...");
+    
+    // Safety timeout - never stay loading more than 10 seconds
+    const safetyTimeout = setTimeout(() => {
+      console.log("⚠️ Safety timeout triggered - forcing loading to false");
+      setIsLoading(false);
+    }, 10000);
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("📡 Initial session:", session ? "Found" : "None");
       setSession(session);
       if (session?.user) {
         loadUserProfile(session.user);
       } else {
         setIsLoading(false);
       }
+    }).catch((error) => {
+      console.error("❌ Error getting session:", error);
+      setIsLoading(false);
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("🔔 Auth state changed:", event, session ? "Session active" : "No session");
       setSession(session);
       if (session?.user) {
         await loadUserProfile(session.user);
@@ -84,11 +97,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(safetyTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Load user profile from database
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+    console.log("🔍 Loading user profile for:", supabaseUser.id);
     try {
       const { data: profile, error } = await supabase
         .from("profiles")
@@ -97,15 +114,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
-        console.error("Error loading profile:", error);
+        console.error("❌ Error loading profile:", error);
         // If profile doesn't exist, create it
         if (error.code === "PGRST116") {
+          console.log("📝 Profile not found, creating...");
           await createUserProfile(supabaseUser);
           return;
         }
+        // For other errors, still set loading to false
+        setIsLoading(false);
+        return;
       }
 
       if (profile) {
+        console.log("✅ Profile loaded:", profile);
         setUser({
           id: profile.id,
           username: profile.username,
@@ -114,14 +136,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
     } catch (error) {
-      console.error("Error in loadUserProfile:", error);
+      console.error("❌ Error in loadUserProfile:", error);
     } finally {
+      console.log("🏁 Setting isLoading to false");
       setIsLoading(false);
     }
   };
 
   // Create user profile in database
   const createUserProfile = async (supabaseUser: SupabaseUser) => {
+    console.log("📝 Creating profile for:", supabaseUser.email);
     try {
       const username = supabaseUser.email?.split("@")[0] || "user";
       
@@ -136,9 +160,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Error creating profile:", error);
+        // Check if profile already exists (duplicate key error)
+        if (error.code === "23505") {
+          console.log("ℹ️ Profile already exists, loading it instead");
+          await loadUserProfile(supabaseUser);
+          return;
+        }
+        throw error;
+      }
 
       if (profile) {
+        console.log("✅ Profile created successfully:", profile);
         setUser({
           id: profile.id,
           username: profile.username,
@@ -147,8 +181,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
     } catch (error) {
-      console.error("Error creating profile:", error);
+      console.error("❌ Error in createUserProfile:", error);
     } finally {
+      console.log("🏁 Setting isLoading to false in createUserProfile");
       setIsLoading(false);
     }
   };
