@@ -223,22 +223,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (authData.user) {
-        // Create profile in database
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .insert({
-            id: authData.user.id,
-            username: data.username,
-            email: data.email,
-            avatar_url: null,
-          });
-
-        if (profileError) {
-          console.error("Error creating profile:", profileError);
-        }
-
-        // Note: User will need to confirm email before they can login
+        // Profile is created automatically by database trigger
+        // Just load the profile if session exists
         if (authData.session) {
+          await loadUserProfile(authData.user);
+        } else {
+          // If no session yet, wait a moment for trigger to complete
+          await new Promise(resolve => setTimeout(resolve, 500));
           await loadUserProfile(authData.user);
         }
       }
