@@ -8,15 +8,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/auth-context";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { RobustAvatar, getInitials } from "@/components/robust-avatar";
 
 export function UserProfile() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   if (!user) return null;
+
+  // Debug avatar
+  console.log("👤 UserProfile - User data:", user);
+  console.log("🖼️ UserProfile - Avatar URL:", user.avatar);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -30,30 +36,23 @@ export function UserProfile() {
     }
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
-            <AvatarFallback className="bg-anime-gradient text-white">
-              {user.avatar || getInitials(user.username)}
-            </AvatarFallback>
-          </Avatar>
+          <RobustAvatar
+            src={user.avatar}
+            fallback={getInitials(user.displayName || user.username)}
+            alt="User Avatar"
+            size="md"
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
-            <p className="font-medium">{user.username}</p>
+            <p className="font-medium">{user.displayName || user.username}</p>
             <p className="w-[200px] truncate text-sm text-muted-foreground">
               {user.email}
             </p>
@@ -66,13 +65,16 @@ export function UserProfile() {
           </div>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem 
+          className="cursor-pointer"
+          onClick={() => navigate('/profile')}
+        >
           <User className="mr-2 h-4 w-4" />
-          <span>Profile</span>
+          <span>Perfil</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+          <span>Configuración</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

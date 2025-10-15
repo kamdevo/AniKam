@@ -7,12 +7,19 @@ import React, {
 } from "react";
 import { supabase } from "@/lib/supabase";
 import { Session, User as SupabaseUser } from "@supabase/supabase-js";
+import { AuthLoading } from "@/components/auth-loading";
 
 interface User {
   id: string;
   username: string;
+  displayName?: string;
   email: string;
   avatar?: string;
+  banner?: string;
+  bio?: string;
+  contentFilter?: 'all' | 'safe' | 'mature';
+  themePreference?: 'light' | 'dark' | 'auto';
+  language?: string;
   isDemo?: boolean;
 }
 
@@ -24,6 +31,8 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   loginWithDemo: () => Promise<void>;
+  signInWithOAuth: (provider: 'google' | 'github') => Promise<void>;
+  updateProfile: (updates: Partial<User>) => Promise<void>;
 }
 
 interface LoginCredentials {
@@ -63,129 +72,254 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     console.log("🚀 AuthProvider initializing...");
     
-    // Safety timeout - never stay loading more than 10 seconds
-    const safetyTimeout = setTimeout(() => {
-      console.log("⚠️ Safety timeout triggered - forcing loading to false");
-      setIsLoading(false);
-    }, 10000);
+    // Removed safety timeout to prevent premature loading state changes
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("📡 Initial session:", session ? "Found" : "None");
-      setSession(session);
-      if (session?.user) {
-        loadUserProfile(session.user);
-      } else {
+    // Get initial session - CRITICAL for persistence
+    const initializeSession = async () => {
+      try {
+        console.log("📡 Checking for existing session...");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("❌ Error getting session:", error);
+          setIsLoading(false);
+          return;
+        }
+
+        console.log("📡 Initial session:", session ? "Found" : "None");
+        if (session) {
+          console.log("📡 Session user:", session.user.email);
+          console.log("📡 Session provider:", session.user.app_metadata?.provider);
+          console.log("📡 Session expires at:", new Date(session.expires_at! * 1000));
+        }
+        
+        setSession(session);
+        
+        if (session?.user) {
+          console.log("📡 Loading profile for existing session...");
+          await loadUserProfile(session.user);
+        } else {
+          console.log("📡 No session found - user needs to login");
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("❌ Error in initializeSession:", error);
         setIsLoading(false);
       }
-    }).catch((error) => {
-      console.error("❌ Error getting session:", error);
-      setIsLoading(false);
-    });
+    };
 
-    // Listen for auth changes
+    initializeSession();
+
+    // Listen for auth changes - CRITICAL for session persistence
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("🔔 Auth state changed:", event, session ? "Session active" : "No session");
-      setSession(session);
+      
+      // Log additional details for OAuth events
       if (session?.user) {
+        console.log("🔔 User email:", session.user.email);
+        console.log("🔔 Auth provider:", session.user.app_metadata?.provider);
+        console.log("🔔 User metadata:", session.user.user_metadata);
+      }
+      
+      setSession(session);
+      
+      // Handle different auth events
+      if (event === 'SIGNED_IN' && session?.user) {
+        console.log("🔔 User signed in - loading profile");
         await loadUserProfile(session.user);
-      } else {
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        console.log("🔔 Token refreshed - maintaining session");
+        // Don't reload profile if user already exists, just update session
+        if (!user) {
+          console.log("🔔 No user in state, loading profile after token refresh");
+          await loadUserProfile(session.user);
+        } else {
+          console.log("🔔 User already in state, keeping existing profile");
+        }
+      } else if (event === 'SIGNED_OUT') {
+        console.log("🔔 User signed out - clearing state");
+        setUser(null);
+        setIsLoading(false);
+      } else if (!session && user) {
+        console.log("🔔 Session lost but user exists - clearing user state");
         setUser(null);
         setIsLoading(false);
       }
     });
 
     return () => {
-      clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
-  }, []);
+  }, []); // Empty dependency array to run only once
 
-  // Load user profile from database
+  // Load existing profile or create new one (enterprise-grade flow)
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     console.log("🔍 Loading user profile for:", supabaseUser.id);
+    console.log("🔍 User metadata:", supabaseUser.user_metadata);
+    
+    // Prevent loading if user is already loaded with same ID
+    if (user && user.id === supabaseUser.id) {
+      console.log("🔍 User already loaded, skipping profile load");
+      setIsLoading(false);
+      return;
+    }
+    
     try {
-      const { data: profile, error } = await supabase
+      // Step 1: Try to load existing profile first (with timeout)
+      console.log("🔍 Checking for existing profile...");
+      const profileQuery = supabase
         .from("profiles")
         .select("*")
         .eq("id", supabaseUser.id)
         .single();
 
-      if (error) {
-        console.error("❌ Error loading profile:", error);
-        // If profile doesn't exist, create it
-        if (error.code === "PGRST116") {
-          console.log("📝 Profile not found, creating...");
-          await createUserProfile(supabaseUser);
-          return;
-        }
-        // For other errors, still set loading to false
+      // Add 5 second timeout for database operations
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Database timeout')), 5000);
+      });
+
+      const { data: existingProfile, error: loadError } = await Promise.race([
+        profileQuery,
+        timeoutPromise
+      ]) as any;
+
+      if (existingProfile && !loadError) {
+        // Profile exists - load it (returning user)
+        console.log("✅ Existing profile found - logging in user:", existingProfile);
+        console.log("🖼️ Avatar URL from database:", existingProfile.avatar_url);
+        console.log("🖼️ Picture field from Google (current):", supabaseUser.user_metadata?.picture);
+        console.log("🖼️ Avatar_url field (current):", supabaseUser.user_metadata?.avatar_url);
+        
+        // PRIORIDAD: Usar picture de Google actual, luego DB, luego fallback
+        const currentAvatar = supabaseUser.user_metadata?.picture || 
+                             existingProfile.avatar_url || 
+                             "👤";
+        
+        console.log("🖼️ Selected avatar:", currentAvatar);
+        
+        const userData = {
+          id: existingProfile.id,
+          username: existingProfile.username,
+          displayName: existingProfile.display_name || existingProfile.username,
+          email: existingProfile.email,
+          avatar: currentAvatar,
+          banner: existingProfile.banner_url || null,
+          bio: existingProfile.bio || null,
+          contentFilter: existingProfile.content_filter || 'all',
+          themePreference: existingProfile.theme_preference || 'auto',
+          language: existingProfile.language || 'es',
+        };
+        
+        console.log("👤 Setting user with avatar:", userData.avatar);
+        setUser(userData);
         setIsLoading(false);
         return;
       }
 
-      if (profile) {
-        console.log("✅ Profile loaded:", profile);
-        setUser({
-          id: profile.id,
-          username: profile.username,
-          email: profile.email,
-          avatar: profile.avatar_url || "👤",
-        });
-      }
-    } catch (error) {
-      console.error("❌ Error in loadUserProfile:", error);
-    } finally {
-      console.log("🏁 Setting isLoading to false");
-      setIsLoading(false);
-    }
-  };
-
-  // Create user profile in database
-  const createUserProfile = async (supabaseUser: SupabaseUser) => {
-    console.log("📝 Creating profile for:", supabaseUser.email);
-    try {
+      // Step 2: Profile doesn't exist - create new one (new user)
+      console.log("📝 No existing profile found - creating new user account");
+      const fullName = supabaseUser.user_metadata?.full_name || supabaseUser.email?.split("@")[0] || "user";
       const username = supabaseUser.email?.split("@")[0] || "user";
+      // PRIORIDAD: picture de Google OAuth primero, luego fallback
+      const avatarUrl = supabaseUser.user_metadata?.picture || null;
       
-      const { data: profile, error } = await supabase
+      console.log("📝 New user data:", { fullName, username, avatarUrl });
+      console.log("🖼️ Picture field from Google:", supabaseUser.user_metadata?.picture);
+      console.log("🖼️ Avatar_url field:", supabaseUser.user_metadata?.avatar_url);
+      console.log("🖼️ Final avatarUrl selected:", avatarUrl);
+      
+      // Create profile in database first (with timeout)
+      const createQuery = supabase
         .from("profiles")
         .insert({
           id: supabaseUser.id,
           username: username,
+          display_name: fullName,
           email: supabaseUser.email!,
-          avatar_url: null,
+          avatar_url: avatarUrl,
+          banner_url: null,
+          bio: null,
+          content_filter: 'all',
+          theme_preference: 'auto',
+          language: 'es',
         })
         .select()
         .single();
 
-      if (error) {
-        console.error("❌ Error creating profile:", error);
-        // Check if profile already exists (duplicate key error)
-        if (error.code === "23505") {
-          console.log("ℹ️ Profile already exists, loading it instead");
-          await loadUserProfile(supabaseUser);
-          return;
-        }
-        throw error;
+      const createTimeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Create timeout')), 5000);
+      });
+
+      const { data: newProfile, error: createError } = await Promise.race([
+        createQuery,
+        createTimeoutPromise
+      ]) as any;
+
+      if (createError) {
+        console.error("❌ Error creating profile:", createError);
+        // If creation fails, still create user object from OAuth data
+        console.log("📝 Creating fallback user from OAuth data");
+      } else {
+        // Profile created successfully
+        console.log("✅ New profile created successfully:", newProfile);
       }
 
-      if (profile) {
-        console.log("✅ Profile created successfully:", profile);
-        setUser({
-          id: profile.id,
-          username: profile.username,
-          email: profile.email,
-          avatar: profile.avatar_url || "👤",
-        });
-      }
+      // Always create user object regardless of DB success/failure
+      // PRIORIDAD: Si no hay picture de Google, usar avatar por defecto (👤)
+      const finalAvatar = avatarUrl || "👤";
+      
+      const userData = {
+        id: supabaseUser.id,
+        username: username,
+        displayName: fullName,
+        email: supabaseUser.email!,
+        avatar: finalAvatar,
+        banner: newProfile?.banner_url || null,
+        bio: newProfile?.bio || null,
+        contentFilter: (newProfile?.content_filter || 'all') as 'all' | 'safe' | 'mature',
+        themePreference: (newProfile?.theme_preference || 'auto') as 'light' | 'dark' | 'auto',
+        language: newProfile?.language || 'es',
+      };
+
+      console.log("📝 Setting user data:", userData);
+      console.log("🖼️ Final avatar URL being set:", userData.avatar);
+      setUser(userData);
+      setIsLoading(false);
+        
     } catch (error) {
-      console.error("❌ Error in createUserProfile:", error);
-    } finally {
-      console.log("🏁 Setting isLoading to false in createUserProfile");
+      console.error("❌ Error in loadUserProfile:", error);
+      
+      // Emergency fallback - create user from OAuth data even if everything fails
+      console.log("🚨 Emergency fallback - creating user from OAuth data");
+      const fallbackFullName = supabaseUser.user_metadata?.full_name || supabaseUser.email?.split("@")[0] || "user";
+      const fallbackUsername = supabaseUser.email?.split("@")[0] || "user";
+      // PRIORIDAD: picture de Google OAuth primero, luego fallback
+      const fallbackAvatarUrl = supabaseUser.user_metadata?.picture || null;
+      
+      setUser({
+        id: supabaseUser.id,
+        username: fallbackUsername,
+        displayName: fallbackFullName,
+        email: supabaseUser.email!,
+        avatar: fallbackAvatarUrl || "👤",
+        banner: null,
+        bio: null,
+        contentFilter: 'all',
+        themePreference: 'auto',
+        language: 'es',
+      });
+      
       setIsLoading(false);
     }
+  };
+
+  // Legacy function - no longer used, but keeping for compatibility
+  const createUserProfile = async (supabaseUser: SupabaseUser) => {
+    // This function is now handled by loadUserProfile
+    console.log("📝 createUserProfile called - redirecting to loadUserProfile");
+    await loadUserProfile(supabaseUser);
   };
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
@@ -312,6 +446,79 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInWithOAuth = async (provider: 'google' | 'github'): Promise<void> => {
+    console.log("🔵 signInWithOAuth called with provider:", provider);
+    
+    try {
+      console.log("🔵 Calling signInWithOAuth...");
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      console.log("🔵 OAuth response:", { data, error });
+
+      if (error) {
+        console.error("❌ OAuth error:", error);
+        throw error;
+      }
+
+      console.log("✅ OAuth initiated successfully, should redirect now...");
+      console.log("📍 Redirect URL:", data?.url);
+      
+      // The user will be redirected to the OAuth provider
+      // After authentication, they'll be redirected back to /auth/callback
+    } catch (error: any) {
+      console.error(`❌ ${provider} auth error:`, error);
+      throw new Error(`Failed to sign in with ${provider}: ${error.message}`);
+    }
+  };
+
+  const updateProfile = async (updates: Partial<User>): Promise<void> => {
+    if (!user) {
+      throw new Error("No user logged in");
+    }
+
+    try {
+      console.log("🔄 Updating profile:", updates);
+      
+      // Prepare database updates
+      const dbUpdates: any = {};
+      if (updates.displayName !== undefined) dbUpdates.display_name = updates.displayName;
+      if (updates.username !== undefined) dbUpdates.username = updates.username;
+      if (updates.avatar !== undefined) dbUpdates.avatar_url = updates.avatar;
+      if (updates.banner !== undefined) dbUpdates.banner_url = updates.banner;
+      if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
+      if (updates.contentFilter !== undefined) dbUpdates.content_filter = updates.contentFilter;
+      if (updates.themePreference !== undefined) dbUpdates.theme_preference = updates.themePreference;
+      if (updates.language !== undefined) dbUpdates.language = updates.language;
+
+      // Update in database
+      const { error } = await supabase
+        .from("profiles")
+        .update(dbUpdates)
+        .eq("id", user.id);
+
+      if (error) {
+        console.error("❌ Error updating profile:", error);
+        throw error;
+      }
+
+      // Update local state
+      setUser(prevUser => ({
+        ...prevUser!,
+        ...updates,
+      }));
+
+      console.log("✅ Profile updated successfully");
+    } catch (error) {
+      console.error("❌ Error in updateProfile:", error);
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
@@ -320,9 +527,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     loginWithDemo,
+    signInWithOAuth,
+    updateProfile,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {isLoading ? (
+        <AuthLoading message={
+          session ? "Cargando tu perfil..." : "Verificando tu sesión..."
+        } />
+      ) : (
+        children
+      )}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth(): AuthContextType {

@@ -40,7 +40,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const { login, register, loginWithDemo, isLoading } = useAuth();
+  const { login, register, loginWithDemo, signInWithOAuth, isLoading } = useAuth();
 
   // Form states
   const [loginForm, setLoginForm] = useState({
@@ -153,33 +153,13 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     console.log("🔵 handleSocialAuth called with provider:", provider);
     
     try {
-      console.log("🔵 Importing supabase...");
-      const { supabase } = await import("@/lib/supabase");
-      console.log("✅ Supabase imported successfully");
-      
-      console.log("🔵 Calling signInWithOAuth...");
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      console.log("🔵 OAuth response:", { data, error });
-
-      if (error) {
-        console.error("❌ OAuth error:", error);
-        throw error;
-      }
-
-      console.log("✅ OAuth initiated successfully, should redirect now...");
-      console.log("📍 Redirect URL:", data?.url);
-      
+      await signInWithOAuth(provider);
       // The user will be redirected to the OAuth provider
       // After authentication, they'll be redirected back to /auth/callback
+      // No need to close modal here as user will be redirected
     } catch (error: any) {
       console.error(`❌ ${provider} auth error:`, error);
-      toast.error(`Failed to sign in with ${provider}`);
+      toast.error(error.message || `Failed to sign in with ${provider}`);
     }
   };
 

@@ -22,6 +22,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
     storage: localStorage,
     flowType: 'pkce', // More secure authentication flow
+    debug: true, // Enable debug mode for OAuth troubleshooting
   },
 });
 
@@ -33,24 +34,42 @@ export interface Database {
         Row: {
           id: string;
           username: string;
+          display_name: string | null;
           email: string;
           avatar_url: string | null;
+          banner_url: string | null;
+          bio: string | null;
+          content_filter: 'all' | 'safe' | 'mature';
+          theme_preference: 'light' | 'dark' | 'auto';
+          language: string;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id: string;
           username: string;
+          display_name?: string | null;
           email: string;
           avatar_url?: string | null;
+          banner_url?: string | null;
+          bio?: string | null;
+          content_filter?: 'all' | 'safe' | 'mature';
+          theme_preference?: 'light' | 'dark' | 'auto';
+          language?: string;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
           username?: string;
+          display_name?: string | null;
           email?: string;
           avatar_url?: string | null;
+          banner_url?: string | null;
+          bio?: string | null;
+          content_filter?: 'all' | 'safe' | 'mature';
+          theme_preference?: 'light' | 'dark' | 'auto';
+          language?: string;
           created_at?: string;
           updated_at?: string;
         };

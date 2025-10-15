@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/auth-context";
+import { AuthLoading } from "@/components/auth-loading";
 
 export default function AuthCallback() {
   const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>("Procesando autenticación...");
+  const [sessionProcessed, setSessionProcessed] = useState(false);
 
   useEffect(() => {
     console.log("🔵 AuthCallback: Iniciando procesamiento de OAuth callback");
@@ -15,87 +20,126 @@ export default function AuthCallback() {
 
     const handleCallback = async () => {
       try {
-        // Extraer el código de la URL
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
+        setStatus("Procesando código de autenticación...");
         
-        console.log("🔵 Código OAuth encontrado:", code ? "Sí" : "No");
-
-        if (!code) {
-          console.log("⚠️ No hay código OAuth, redirigiendo a home...");
-          if (mounted) navigate("/", { replace: true });
-          return;
-        }
-
-        // Esperar a que Supabase procese el código automáticamente
-        // El SDK maneja esto internamente cuando hay un código en la URL
-        console.log("🔵 Esperando procesamiento de código OAuth...");
+        // Usar el método correcto de Supabase para intercambiar el código por una sesión
+        console.log("🔵 Intercambiando código por sesión...");
+        const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.search);
         
-        // Dar tiempo a Supabase para procesar
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error("❌ AuthCallback: Error al obtener sesión:", sessionError);
-          setError(sessionError.message);
+        if (error) {
+          console.error("❌ AuthCallback: Error intercambiando código:", error);
+          setError(error.message);
+          setStatus("Error en la autenticación");
           timeoutId = setTimeout(() => {
             if (mounted) navigate("/", { replace: true });
-          }, 2000);
+          }, 3000);
           return;
         }
 
-        if (session) {
+        if (data.session) {
           console.log("✅ AuthCallback: Sesión obtenida exitosamente");
-          console.log("✅ Usuario:", session.user.email);
-          if (mounted) navigate("/", { replace: true });
+          console.log("✅ Usuario:", data.session.user.email);
+          setStatus("¡Autenticación exitosa! Configurando perfil...");
+          setSessionProcessed(true);
+          
+          // No redirigir aquí, esperar a que el auth context procese el usuario
         } else {
-          console.log("⚠️ AuthCallback: No se pudo obtener sesión después de procesar código");
-          console.log("⚠️ Redirigiendo a home de todos modos...");
-          if (mounted) navigate("/", { replace: true });
+          console.log("⚠️ AuthCallback: No se pudo obtener sesión");
+          setError("No se pudo completar la autenticación");
+          setStatus("Error en la autenticación");
+          timeoutId = setTimeout(() => {
+            if (mounted) navigate("/", { replace: true });
+          }, 3000);
         }
       } catch (err: any) {
         console.error("❌ AuthCallback: Error inesperado:", err);
         setError(err.message);
+        setStatus("Error inesperado");
         timeoutId = setTimeout(() => {
           if (mounted) navigate("/", { replace: true });
-        }, 2000);
+        }, 3000);
       }
     };
 
-    // Ejecutar el callback
-    handleCallback();
-
-    // Timeout de seguridad: si después de 5 segundos no se ha redirigido, forzar redirección
-    const safetyTimeout = setTimeout(() => {
-      console.log("⏰ Timeout de seguridad alcanzado, forzando redirección...");
+    // Verificar si hay parámetros de OAuth en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasOAuthParams = urlParams.has('code') || urlParams.has('access_token') || urlParams.has('error');
+    
+    if (hasOAuthParams) {
+      console.log("🔵 Parámetros OAuth detectados, procesando...");
+      handleCallback();
+    } else {
+      console.log("⚠️ No hay parámetros OAuth, redirigiendo a home...");
       if (mounted) navigate("/", { replace: true });
-    }, 5000);
+    }
 
     // Cleanup
     return () => {
       mounted = false;
       if (timeoutId) clearTimeout(timeoutId);
-      clearTimeout(safetyTimeout);
     };
   }, [navigate]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-        <p className="text-gray-600 mb-2">
-          {error ? `Error: ${error}` : "Verificando autenticación..."}
-        </p>
-        {error && (
-          <p className="text-sm text-gray-500">Redirigiendo en breve...</p>
-        )}
-        {!error && (
-          <p className="text-xs text-gray-400 mt-4">
-            Esto solo debería tomar unos segundos
+  // Efecto separado para manejar la redirección cuando el usuario esté listo
+  useEffect(() => {
+    if (sessionProcessed && !isLoading && user) {
+      console.log("✅ AuthCallback: Usuario procesado completamente, redirigiendo...");
+      setStatus("¡Completado! Redirigiendo...");
+      
+      const redirectTimeout = setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 1000);
+
+      return () => clearTimeout(redirectTimeout);
+    }
+  }, [sessionProcessed, isLoading, user, navigate]);
+
+  // Emergency timeout only as last resort (60 seconds)
+  useEffect(() => {
+    const emergencyTimeout = setTimeout(() => {
+      if (!user && !error) {
+        console.log("🚨 Emergency timeout after 60 seconds - redirecting...");
+        navigate("/", { replace: true });
+      }
+    }, 60000); // 60 segundos como último recurso
+
+    return () => clearTimeout(emergencyTimeout);
+  }, [user, error, navigate]);
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-red-900 dark:to-gray-900">
+        <div className="text-center p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-red-200">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-red-600 text-2xl">⚠️</span>
+          </div>
+          
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            Error de Autenticación
+          </h2>
+          
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            {error}
           </p>
-        )}
+          
+          <p className="text-sm text-gray-500 dark:text-gray-500">
+            Redirigiendo al inicio en breve...
+          </p>
+        </div>
       </div>
-    </div>
+    );
+  }
+
+  // Show success state if user is loaded
+  if (sessionProcessed && user) {
+    return (
+      <AuthLoading message={`¡Bienvenido de vuelta, ${user.displayName || user.username}! 🎉`} />
+    );
+  }
+
+  // Show loading state
+  return (
+    <AuthLoading message={status} />
   );
 }

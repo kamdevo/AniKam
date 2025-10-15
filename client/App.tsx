@@ -11,6 +11,7 @@ import Catalog from "./pages/Catalog";
 import Library from "./pages/Library";
 import AnimeDetails from "./pages/AnimeDetails";
 import AuthCallback from "./pages/AuthCallback";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Tracker from "@openreplay/tracker";
 
@@ -63,6 +64,14 @@ function App() {
               <Route
                 path="/manga/:id"
                 element={<AnimeDetails type="manga" />}
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } 
               />
               <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="*" element={<NotFound />} />
