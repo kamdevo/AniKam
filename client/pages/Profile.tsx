@@ -1,17 +1,16 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   User,
-  Camera,
   Edit3,
   Save,
   X,
+  Camera,
+  Upload,
   Settings,
   Shield,
   Palette,
-  Globe,
-  Upload,
-  Image as ImageIcon,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +22,9 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { useAuth } from "@/contexts/auth-context";
 import { toast } from "sonner";
 import { RobustAvatar, getInitials } from "@/components/robust-avatar";
+import { FileUpload } from "@/components/file-upload";
+import { useAvatarUpload, useBannerUpload } from "@/hooks/use-file-upload";
+import { useImageUploadFallback } from "@/hooks/use-image-upload-fallback";
 
 // Avatars anime por defecto
 const DEFAULT_ANIME_AVATARS = [
@@ -30,36 +32,46 @@ const DEFAULT_ANIME_AVATARS = [
   "👽", "🧚‍♂️", "🧚‍♀️", "🧝‍♂️", "🧝‍♀️", "🧞‍♂️", "🧞‍♀️", "🧛‍♂️", "🧛‍♀️", "🐱‍👤"
 ];
 
-// Banners por defecto
-const DEFAULT_BANNERS = [
-  "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=300&fit=crop&sat=-100",
-  "https://images.unsplash.com/photo-1519681393784-d120c3b0c1d4?w=1200&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1200&h=300&fit=crop",
-];
-
 export default function Profile() {
   const { user, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
-  const [showBannerPicker, setShowBannerPicker] = useState(false);
+  
+  // Hooks para subida de archivos
+  const avatarUpload = useAvatarUpload();
+  const bannerUpload = useBannerUpload();
+  const fallbackUpload = useImageUploadFallback();
 
   // Form state
   const [formData, setFormData] = useState({
     displayName: user?.displayName || user?.username || "",
-    username: user?.username || "",
     bio: user?.bio || "",
     contentFilter: user?.contentFilter || "all",
     themePreference: user?.themePreference || "auto",
     language: user?.language || "es",
   });
 
+  // Update form data when user changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        displayName: user.displayName || user.username || "",
+        bio: user.bio || "",
+        contentFilter: user.contentFilter || "all",
+        themePreference: user.themePreference || "auto",
+        language: user.language || "es",
+      });
+    }
+  }, [user]);
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Debes iniciar sesión para ver tu perfil</p>
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Acceso Requerido</h2>
+          <p className="text-muted-foreground">Debes iniciar sesión para ver tu perfil</p>
+        </div>
       </div>
     );
   }
@@ -80,12 +92,11 @@ export default function Profile() {
 
   const handleCancel = () => {
     setFormData({
-      displayName: user?.displayName || user?.username || "",
-      username: user?.username || "",
-      bio: user?.bio || "",
-      contentFilter: user?.contentFilter || "all",
-      themePreference: user?.themePreference || "auto",
-      language: user?.language || "es",
+      displayName: user.displayName || user.username || "",
+      bio: user.bio || "",
+      contentFilter: user.contentFilter || "all",
+      themePreference: user.themePreference || "auto",
+      language: user.language || "es",
     });
     setIsEditing(false);
   };
@@ -100,466 +111,400 @@ export default function Profile() {
     }
   };
 
-  const handleBannerSelect = async (banner: string) => {
-    try {
-      await updateProfile({ banner });
-      setShowBannerPicker(false);
-      toast.success("Banner actualizado");
-    } catch (error) {
-      toast.error("Error al actualizar banner");
+  // Funciones de upload con fallback
+  const handleAvatarUpload = async (file: File) => {
+    console.log("🔄 Intentando subir avatar...");
+    
+    // Intentar Supabase Storage primero
+    let result = await avatarUpload.uploadFile(file, `avatar-${user.id}`);
+    
+    // Si falla por bucket no encontrado, usar fallback base64
+    if (result.error && result.error.includes('Bucket not found')) {
+      console.log("📦 Storage no disponible, usando fallback base64...");
+      result = await fallbackUpload.convertToBase64(file);
     }
+    
+    if (result.url) {
+      await updateProfile({ avatar: result.url });
+      toast.success("Avatar actualizado correctamente");
+    }
+    return result;
+  };
+
+  const handleBannerUpload = async (file: File) => {
+    console.log("🔄 Intentando subir banner...");
+    
+    // Intentar Supabase Storage primero
+    let result = await bannerUpload.uploadFile(file, `banner-${user.id}`);
+    
+    // Si falla por bucket no encontrado, usar fallback base64
+    if (result.error && result.error.includes('Bucket not found')) {
+      console.log("📦 Storage no disponible, usando fallback base64...");
+      result = await fallbackUpload.convertToBase64(file);
+    }
+    
+    if (result.url) {
+      await updateProfile({ banner: result.url });
+      toast.success("Banner actualizado correctamente");
+    }
+    return result;
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header con banner */}
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative mb-8"
+          className="mb-8"
         >
-          <GlassCard className="overflow-hidden">
-            {/* Banner */}
-            <div 
-              className="h-48 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 relative group cursor-pointer"
-              style={{
-                backgroundImage: user.banner ? `url(${user.banner})` : undefined,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-              onClick={() => setShowBannerPicker(true)}
-            >
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <Camera className="w-8 h-8 text-white" />
-              </div>
-            </div>
-
-            {/* Información del perfil */}
-            <div className="p-6 relative">
-              {/* Avatar */}
-              <div className="absolute -top-16 left-6">
-                <div 
-                  className="w-24 h-24 rounded-full bg-white dark:bg-gray-800 p-1 shadow-lg group cursor-pointer relative"
-                  onClick={() => setShowAvatarPicker(true)}
-                >
-                  <RobustAvatar
-                    src={user.avatar}
-                    fallback={getInitials(user.displayName || user.username)}
-                    alt="Profile Avatar"
-                    size="lg"
-                    className="w-full h-full group-hover:opacity-80 transition-opacity"
-                  />
-                  <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Camera className="w-5 h-5 text-white" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Información básica */}
-              <div className="ml-32 flex justify-between items-start">
-                <div>
-                  <h1 className="text-2xl font-bold gradient-text">
-                    {user.displayName || user.username}
-                  </h1>
-                  <p className="text-muted-foreground">@{user.username}</p>
-                  {user.bio && (
-                    <p className="text-sm text-muted-foreground mt-2 max-w-md">
-                      {user.bio}
-                    </p>
-                  )}
-                </div>
-                
-                <Button
-                  onClick={() => setIsEditing(!isEditing)}
-                  variant={isEditing ? "outline" : "default"}
-                  className="bg-anime-gradient hover:opacity-90"
-                >
-                  {isEditing ? (
-                    <>
-                      <X className="w-4 h-4 mr-2" />
-                      Cancelar
-                    </>
-                  ) : (
-                    <>
-                      <Edit3 className="w-4 h-4 mr-2" />
-                      Editar Perfil
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </GlassCard>
+          <h1 className="text-3xl font-bold gradient-text mb-2">Mi Perfil</h1>
+          <p className="text-muted-foreground">
+            Personaliza tu perfil y configuraciones
+          </p>
         </motion.div>
 
-        {/* Contenido principal */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Panel principal */}
-          <div className="lg:col-span-2">
-            <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="profile">
-                  <User className="w-4 h-4 mr-2" />
-                  Perfil
-                </TabsTrigger>
-                <TabsTrigger value="preferences">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Preferencias
-                </TabsTrigger>
-                <TabsTrigger value="privacy">
-                  <Shield className="w-4 h-4 mr-2" />
-                  Privacidad
-                </TabsTrigger>
-              </TabsList>
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Perfil
+            </TabsTrigger>
+            <TabsTrigger value="appearance" className="flex items-center gap-2">
+              <Palette className="w-4 h-4" />
+              Apariencia
+            </TabsTrigger>
+            <TabsTrigger value="content" className="flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              Contenido
+            </TabsTrigger>
+            <TabsTrigger value="language" className="flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              Idioma
+            </TabsTrigger>
+          </TabsList>
 
-              {/* Tab de Perfil */}
-              <TabsContent value="profile">
-                <GlassCard className="p-6">
-                  <h2 className="text-xl font-semibold mb-6">Información Personal</h2>
-                  
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="displayName">Nombre para mostrar</Label>
-                        <Input
-                          id="displayName"
-                          value={formData.displayName}
-                          onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
-                          disabled={!isEditing}
-                          className="bg-glass/50"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="username">Nombre de usuario</Label>
-                        <Input
-                          id="username"
-                          value={formData.username}
-                          onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                          disabled={!isEditing}
-                          className="bg-glass/50"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="bio">Biografía</Label>
-                      <Textarea
-                        id="bio"
-                        value={formData.bio}
-                        onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                        disabled={!isEditing}
-                        placeholder="Cuéntanos sobre ti..."
-                        className="bg-glass/50 min-h-[100px]"
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Email</Label>
-                      <Input
-                        value={user.email}
-                        disabled
-                        className="bg-glass/30 text-muted-foreground"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        El email no se puede cambiar
-                      </p>
-                    </div>
-
-                    {isEditing && (
-                      <div className="flex gap-3 pt-4">
-                        <Button
-                          onClick={handleSave}
-                          disabled={isLoading}
-                          className="bg-anime-gradient hover:opacity-90"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          {isLoading ? "Guardando..." : "Guardar Cambios"}
-                        </Button>
-                        <Button
-                          onClick={handleCancel}
-                          variant="outline"
-                        >
-                          Cancelar
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </GlassCard>
-              </TabsContent>
-
-              {/* Tab de Preferencias */}
-              <TabsContent value="preferences">
-                <GlassCard className="p-6">
-                  <h2 className="text-xl font-semibold mb-6">Preferencias</h2>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <Label htmlFor="theme">
-                        <Palette className="w-4 h-4 inline mr-2" />
-                        Tema
-                      </Label>
-                      <Select
-                        value={formData.themePreference}
-                        onValueChange={(value: any) => setFormData(prev => ({ ...prev, themePreference: value }))}
-                        disabled={!isEditing}
-                      >
-                        <SelectTrigger className="bg-glass/50">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="light">Claro</SelectItem>
-                          <SelectItem value="dark">Oscuro</SelectItem>
-                          <SelectItem value="auto">Automático</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="language">
-                        <Globe className="w-4 h-4 inline mr-2" />
-                        Idioma
-                      </Label>
-                      <Select
-                        value={formData.language}
-                        onValueChange={(value) => setFormData(prev => ({ ...prev, language: value }))}
-                        disabled={!isEditing}
-                      >
-                        <SelectTrigger className="bg-glass/50">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="es">Español</SelectItem>
-                          <SelectItem value="en">English</SelectItem>
-                          <SelectItem value="ja">日本語</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {isEditing && (
-                      <div className="flex gap-3 pt-4">
-                        <Button
-                          onClick={handleSave}
-                          disabled={isLoading}
-                          className="bg-anime-gradient hover:opacity-90"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          {isLoading ? "Guardando..." : "Guardar Cambios"}
-                        </Button>
-                        <Button
-                          onClick={handleCancel}
-                          variant="outline"
-                        >
-                          Cancelar
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </GlassCard>
-              </TabsContent>
-
-              {/* Tab de Privacidad */}
-              <TabsContent value="privacy">
-                <GlassCard className="p-6">
-                  <h2 className="text-xl font-semibold mb-6">Filtro de Contenido</h2>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="contentFilter">
-                        <Shield className="w-4 h-4 inline mr-2" />
-                        Nivel de filtro
-                      </Label>
-                      <Select
-                        value={formData.contentFilter}
-                        onValueChange={(value: any) => setFormData(prev => ({ ...prev, contentFilter: value }))}
-                        disabled={!isEditing}
-                      >
-                        <SelectTrigger className="bg-glass/50">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="safe">Seguro - Solo contenido familiar</SelectItem>
-                          <SelectItem value="all">Todo - Incluye contenido maduro</SelectItem>
-                          <SelectItem value="mature">Maduro - Solo contenido para adultos</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Controla qué tipo de contenido quieres ver en la aplicación
-                      </p>
-                    </div>
-
-                    {isEditing && (
-                      <div className="flex gap-3 pt-4">
-                        <Button
-                          onClick={handleSave}
-                          disabled={isLoading}
-                          className="bg-anime-gradient hover:opacity-90"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          {isLoading ? "Guardando..." : "Guardar Cambios"}
-                        </Button>
-                        <Button
-                          onClick={handleCancel}
-                          variant="outline"
-                        >
-                          Cancelar
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </GlassCard>
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          {/* Panel lateral */}
-          <div className="space-y-6">
-            {/* Estadísticas */}
-            <GlassCard className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Estadísticas</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Anime vistos</span>
-                  <span className="font-semibold">42</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Manga leídos</span>
-                  <span className="font-semibold">28</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Horas vistas</span>
-                  <span className="font-semibold">1,247</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Miembro desde</span>
-                  <span className="font-semibold">2024</span>
-                </div>
-              </div>
-            </GlassCard>
-
-            {/* Géneros favoritos */}
-            <GlassCard className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Géneros Favoritos</h3>
-              <div className="flex flex-wrap gap-2">
-                {["Acción", "Romance", "Comedia", "Drama", "Fantasía"].map((genre) => (
-                  <span
-                    key={genre}
-                    className="px-3 py-1 bg-anime-gradient text-white text-sm rounded-full"
-                  >
-                    {genre}
-                  </span>
-                ))}
-              </div>
-            </GlassCard>
-          </div>
-        </div>
-
-        {/* Modal de selección de avatar */}
-        {showAvatarPicker && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Seleccionar Avatar</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAvatarPicker(false)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-5 gap-3 mb-4">
-                {DEFAULT_ANIME_AVATARS.map((avatar, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleAvatarSelect(avatar)}
-                    className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-xl hover:scale-110 transition-transform"
-                  >
-                    {avatar}
-                  </button>
-                ))}
-              </div>
-              
-              <div className="border-t pt-4">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    // TODO: Implementar subida de imagen personalizada
-                    toast.info("Función de subida de imagen próximamente");
-                  }}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Subir imagen personalizada
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-
-        {/* Modal de selección de banner */}
-        {showBannerPicker && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-2xl w-full"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Seleccionar Banner</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowBannerPicker(false)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                {DEFAULT_BANNERS.map((banner, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleBannerSelect(banner)}
-                    className="aspect-[3/1] rounded-lg overflow-hidden hover:scale-105 transition-transform"
-                  >
+          {/* Perfil Tab - Customización completa */}
+          <TabsContent value="profile">
+            <div className="space-y-6">
+              {/* Banner y Avatar */}
+              <GlassCard className="relative overflow-hidden">
+                {/* Banner */}
+                <div className="relative h-48 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500">
+                  {user.banner && (
                     <img
-                      src={banner}
-                      alt={`Banner ${index + 1}`}
+                      src={user.banner}
+                      alt="Banner"
                       className="w-full h-full object-cover"
                     />
-                  </button>
-                ))}
-              </div>
+                  )}
+                </div>
+
+                {/* Información del perfil */}
+                <div className="p-6 relative">
+                  {/* Avatar */}
+                  <div className="absolute -top-16 left-6">
+                    <div className="w-24 h-24 rounded-full bg-white dark:bg-gray-800 p-1 shadow-lg">
+                      <RobustAvatar
+                        src={user.avatar}
+                        fallback={getInitials(user.displayName || user.username)}
+                        alt="Profile Avatar"
+                        size="lg"
+                        className="w-full h-full"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Información básica */}
+                  <div className="ml-32 flex justify-between items-start">
+                    <div>
+                      <h1 className="text-2xl font-bold gradient-text">
+                        {user.displayName || user.username}
+                      </h1>
+                      <p className="text-muted-foreground">@{user.username}</p>
+                      {user.bio && (
+                        <p className="text-sm text-muted-foreground mt-2 max-w-md">
+                          {user.bio}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      onClick={() => {
+                        if (isEditing) {
+                          handleCancel();
+                        } else {
+                          setIsEditing(true);
+                        }
+                      }}
+                      variant={isEditing ? "outline" : "default"}
+                    >
+                      {isEditing ? (
+                        <>
+                          <X className="w-4 h-4 mr-2" />
+                          Cancelar
+                        </>
+                      ) : (
+                        <>
+                          <Edit3 className="w-4 h-4 mr-2" />
+                          Editar Perfil
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </GlassCard>
+
+              {/* Secciones de Edición - Solo aparecen cuando isEditing es true */}
+              <AnimatePresence>
+                {isEditing && (
+                  <>
+                    {/* Subida de Banner */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -20, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: "auto" }}
+                      exit={{ opacity: 0, y: -20, height: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                    >
+                      <GlassCard className="p-6">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                          <Upload className="w-5 h-5" />
+                          Banner de Perfil
+                        </h3>
+                        <FileUpload
+                          variant="banner"
+                          currentImageUrl={user.banner || undefined}
+                          onFileSelect={() => {}}
+                          onUpload={handleBannerUpload}
+                          isUploading={bannerUpload.isUploading}
+                          uploadProgress={bannerUpload.uploadProgress}
+                          maxSize={5}
+                        />
+                      </GlassCard>
+                    </motion.div>
+
+                    {/* Subida de Avatar */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -20, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: "auto" }}
+                      exit={{ opacity: 0, y: -20, height: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut", delay: 0.1 }}
+                    >
+                      <GlassCard className="p-6">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                          <User className="w-5 h-5" />
+                          Avatar de Perfil
+                        </h3>
+                        <div className="flex items-center gap-6 mb-6">
+                          <RobustAvatar
+                            src={user.avatar}
+                            fallback={getInitials(user.displayName || user.username)}
+                            alt="Current Avatar"
+                            size="lg"
+                            className="w-24 h-24"
+                          />
+                          <div className="flex-1">
+                            <FileUpload
+                              variant="avatar"
+                              currentImageUrl={user.avatar?.startsWith('http') ? user.avatar : undefined}
+                              onFileSelect={() => {}}
+                              onUpload={handleAvatarUpload}
+                              isUploading={avatarUpload.isUploading}
+                              uploadProgress={avatarUpload.uploadProgress}
+                              maxSize={2}
+                              className="max-w-xs"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Avatars predeterminados */}
+                        <div>
+                          <Label className="text-sm font-medium mb-3 block">O elige un avatar predeterminado:</Label>
+                          <div className="grid grid-cols-10 gap-2">
+                            {DEFAULT_ANIME_AVATARS.map((avatar, index) => (
+                              <button
+                                key={index}
+                                onClick={() => handleAvatarSelect(avatar)}
+                                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-lg transition-colors"
+                              >
+                                {avatar}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </GlassCard>
+                    </motion.div>
+
+                    {/* Información Personal */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -20, height: 0 }}
+                      animate={{ opacity: 1, y: 0, height: "auto" }}
+                      exit={{ opacity: 0, y: -20, height: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut", delay: 0.2 }}
+                    >
+                      <GlassCard className="p-6">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                          <Edit3 className="w-5 h-5" />
+                          Editar Información
+                        </h3>
+                        
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="displayName">Nombre para mostrar</Label>
+                            <Input
+                              id="displayName"
+                              value={formData.displayName}
+                              onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
+                              placeholder="Tu nombre completo"
+                            />
+                          </div>
+
+                          <div>
+                            <Label htmlFor="bio">Biografía</Label>
+                            <Textarea
+                              id="bio"
+                              value={formData.bio}
+                              onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                              placeholder="Cuéntanos sobre ti..."
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-6">
+                          <Button variant="outline" onClick={handleCancel}>
+                            Cancelar
+                          </Button>
+                          <Button onClick={handleSave} disabled={isLoading}>
+                            <Save className="w-4 h-4 mr-2" />
+                            {isLoading ? "Guardando..." : "Guardar Cambios"}
+                          </Button>
+                        </div>
+                      </GlassCard>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+          </TabsContent>
+
+          {/* Apariencia Tab */}
+          <TabsContent value="appearance">
+            <GlassCard className="p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Palette className="w-5 h-5" />
+                Preferencias de Apariencia
+              </h3>
               
-              <div className="border-t pt-4 flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => handleBannerSelect("")}
-                >
-                  Sin banner
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    // TODO: Implementar subida de imagen personalizada
-                    toast.info("Función de subida de imagen próximamente");
-                  }}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Subir personalizado
-                </Button>
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">Tema</Label>
+                  <Select
+                    value={formData.themePreference}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, themePreference: value as any }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="light">🌞 Claro</SelectItem>
+                      <SelectItem value="dark">🌙 Oscuro</SelectItem>
+                      <SelectItem value="auto">🔄 Automático</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    El tema automático cambia según la configuración de tu sistema
+                  </p>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button onClick={handleSave} disabled={isLoading}>
+                    <Save className="w-4 h-4 mr-2" />
+                    {isLoading ? "Guardando..." : "Guardar Cambios"}
+                  </Button>
+                </div>
               </div>
-            </motion.div>
-          </div>
-        )}
+            </GlassCard>
+          </TabsContent>
+
+          {/* Contenido Tab */}
+          <TabsContent value="content">
+            <GlassCard className="p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Filtros de Contenido
+              </h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">Nivel de Filtro</Label>
+                  <Select
+                    value={formData.contentFilter}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, contentFilter: value as any }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="safe">🛡️ Seguro - Solo contenido familiar</SelectItem>
+                      <SelectItem value="all">🌟 Todo - Contenido general</SelectItem>
+                      <SelectItem value="mature">🔞 Maduro - Incluye contenido para adultos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Controla qué tipo de contenido anime y manga se muestra
+                  </p>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button onClick={handleSave} disabled={isLoading}>
+                    <Save className="w-4 h-4 mr-2" />
+                    {isLoading ? "Guardando..." : "Guardar Cambios"}
+                  </Button>
+                </div>
+              </div>
+            </GlassCard>
+          </TabsContent>
+
+          {/* Idioma Tab */}
+          <TabsContent value="language">
+            <GlassCard className="p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Globe className="w-5 h-5" />
+                Configuración de Idioma
+              </h3>
+              
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-sm font-medium mb-3 block">Idioma de la Interfaz</Label>
+                  <Select
+                    value={formData.language}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, language: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="es">🇪🇸 Español</SelectItem>
+                      <SelectItem value="en">🇺🇸 English</SelectItem>
+                      <SelectItem value="ja">🇯🇵 日本語</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Idioma principal de la aplicación
+                  </p>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button onClick={handleSave} disabled={isLoading}>
+                    <Save className="w-4 h-4 mr-2" />
+                    {isLoading ? "Guardando..." : "Guardar Cambios"}
+                  </Button>
+                </div>
+              </div>
+            </GlassCard>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

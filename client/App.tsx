@@ -5,20 +5,15 @@ import { ScrollProgress } from "./components/ui/scroll-progress";
 import { NetworkStatusNotification } from "./components/ui/network-status";
 import { ProtectedRoute } from "./components/protected-route";
 import { AuthProvider } from "./contexts/auth-context";
-import { Toaster } from "sonner";
 import Index from "./pages/Index";
 import Catalog from "./pages/Catalog";
 import Library from "./pages/Library";
 import AnimeDetails from "./pages/AnimeDetails";
 import AuthCallback from "./pages/AuthCallback";
-import Profile from "./pages/Profile";
+import Profile from "@/pages/Profile";
+import Settings from "@/pages/Settings";
 import NotFound from "./pages/NotFound";
-import Tracker from "@openreplay/tracker";
-
-const tracker = new Tracker({
-  projectKey: "Oa7Tm6o3GOFjRutwamQS",
-});
-tracker.start();
+import { Toaster } from "sonner";
 
 function App() {
   const [isDark, setIsDark] = useState(() => {
@@ -70,6 +65,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/settings" 
+                element={
+                  <ProtectedRoute>
+                    <Settings />
                   </ProtectedRoute>
                 } 
               />

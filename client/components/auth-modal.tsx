@@ -717,15 +717,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               <Chrome className="w-4 h-4 mr-2" />
               Google
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleSocialAuth("github")}
-              disabled={isLoading}
-              className="bg-glass/30 border-glass-border/50 hover:bg-glass/50 transition-all"
-            >
-              <Github className="w-4 h-4 mr-2" />
-              GitHub
-            </Button>
+            
           </motion.div>
 
           {/* Switch between login/register */}

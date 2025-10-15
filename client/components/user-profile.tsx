@@ -65,18 +65,14 @@ export function UserProfile() {
           </div>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          className="cursor-pointer"
-          onClick={() => navigate('/profile')}
-        >
+        <DropdownMenuItem onClick={() => navigate('/profile')}>
           <User className="mr-2 h-4 w-4" />
-          <span>Perfil</span>
+          <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem onClick={() => navigate('/settings')}>
           <Settings className="mr-2 h-4 w-4" />
-          <span>Configuración</span>
+          <span>Settings</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer text-red-600 dark:text-red-400"
           onClick={handleLogout}
