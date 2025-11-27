@@ -76,7 +76,7 @@ export default function Library() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-            My <span className="gradient-text">Library</span>
+            My <span className="text-primary">Library</span>
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
             Track your anime and manga progress, organize your collection
@@ -85,7 +85,7 @@ export default function Library() {
 
         <GlassCard className="p-8 sm:p-12 text-center">
           <div className="max-w-md mx-auto space-y-6">
-            <div className="w-20 h-20 bg-anime-gradient rounded-full flex items-center justify-center mx-auto">
+            <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto">
               <LogIn className="w-10 h-10 text-white" />
             </div>
 
@@ -104,7 +104,7 @@ export default function Library() {
             <div className="space-y-3">
               <Button
                 onClick={() => setShowAuthModal(true)}
-                className="w-full bg-anime-gradient hover:opacity-90 text-white"
+                className="w-full bg-primary hover:opacity-90 text-white"
                 size="lg"
               >
                 Sign In to Continue
@@ -136,7 +136,7 @@ export default function Library() {
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-          My <span className="gradient-text">Library</span>
+          My <span className="text-primary">Library</span>
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
           Track your anime and manga progress, organize your collection
@@ -178,7 +178,7 @@ export default function Library() {
           </div>
         </GlassCard>
         <GlassCard className="p-3 sm:p-4 text-center">
-          <div className="text-lg sm:text-2xl font-bold gradient-text-subtle">
+          <div className="text-lg sm:text-2xl font-bold text-primary-subtle">
             {libraryStats.totalEpisodes}
           </div>
           <div className="text-xs sm:text-sm text-muted-foreground">
@@ -186,7 +186,7 @@ export default function Library() {
           </div>
         </GlassCard>
         <GlassCard className="p-3 sm:p-4 text-center">
-          <div className="text-lg sm:text-2xl font-bold gradient-text-subtle">
+          <div className="text-lg sm:text-2xl font-bold text-primary-subtle">
             {libraryStats.averageRating.toFixed(1)}
           </div>
           <div className="text-xs sm:text-sm text-muted-foreground">
@@ -280,7 +280,7 @@ export default function Library() {
                             <div className="flex items-center gap-2">
                               <div className="w-20 bg-muted rounded-full h-2">
                                 <div
-                                  className="bg-gradient-to-r from-success to-primary h-2 rounded-full"
+                                  className="bg-success h-2 rounded-full"
                                   style={{
                                     width: `${((anime.userProgress || 0) / (anime.episodes || 1)) * 100}%`,
                                   }}

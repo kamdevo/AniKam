@@ -7,7 +7,7 @@ interface AuthLoadingProps {
 
 export function AuthLoading({ message = "Verificando autenticación..." }: AuthLoadingProps) {
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-background via-background-secondary to-background z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-background z-50 flex items-center justify-center">
       <div className="text-center">
         {/* Animated Logo */}
         <motion.div
@@ -26,7 +26,7 @@ export function AuthLoading({ message = "Verificando autenticación..." }: AuthL
                 repeat: Infinity,
                 ease: "linear",
               }}
-              className="w-20 h-20 bg-anime-gradient rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl"
+              className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl"
             >
               <span className="text-white font-bold text-3xl">🧩</span>
             </motion.div>
@@ -54,7 +54,7 @@ export function AuthLoading({ message = "Verificando autenticación..." }: AuthL
           transition={{ delay: 0.2, duration: 0.5 }}
           className="space-y-4"
         >
-          <h2 className="text-2xl font-bold gradient-text">AniKam</h2>
+          <h2 className="text-2xl font-bold text-primary">AniKam</h2>
           
           <div className="flex items-center justify-center gap-2 text-muted-foreground">
             <motion.div
@@ -128,7 +128,7 @@ export function AuthLoading({ message = "Verificando autenticación..." }: AuthL
                   repeat: Infinity,
                   delay: i * 0.2,
                 }}
-                className="w-2 h-2 bg-anime-gradient rounded-full"
+                className="w-2 h-2 bg-primary rounded-full"
               />
             ))}
           </motion.div>
@@ -156,7 +156,7 @@ export function SimpleAuthLoading({ message = "Cargando..." }: AuthLoadingProps)
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 bg-anime-gradient rounded-full flex items-center justify-center mx-auto"
+          className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto"
         >
           <span className="text-white font-bold text-xl">🧩</span>
         </motion.div>

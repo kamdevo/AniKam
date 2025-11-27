@@ -101,18 +101,17 @@ export default function Index() {
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-background/60 via-background/40 to-background/55" />
-        <div className="absolute inset-0 bg-anime-gradient opacity-10" />
+        <div className="absolute inset-0 bg-black/50" />
         <div className="relative container mx-auto px-4 py-20 z-10">
           <div className="text-center space-y-8 max-w-4xl mx-auto">
             {/* Main heading */}
             {/* Welcome message for authenticated users */}
             {isAuthenticated && user && (
               <div className="mb-8 animate-fade-in">
-                <GlassCard className="inline-block px-6 py-3 backdrop-blur-xl bg-background/30 border-white/20">
-                  <div className="flex items-center gap-2 text-lg">
+                <GlassCard className="inline-block px-6 py-3 backdrop-blur-xl bg-white/50 dark:bg-background/30 border-white/20">
+                  <div className="flex items-center gap-2 text-lg text-foreground dark:text-white">
                     <span>Welcome back, </span>
-                    <span className="font-semibold gradient-text">
+                    <span className="font-semibold text-primary dark:text-primary-light">
                       {user.username}
                     </span>
                     {user.isDemo && (
@@ -128,13 +127,13 @@ export default function Index() {
 
             <div className="space-y-4 animate-fade-in">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold drop-shadow-lg leading-tight">
-                <span className="gradient-text">Your Ultimate</span>
+                <span className="text-white">Your Ultimate</span>
                 <br />
-                <span className="text-foreground drop-shadow-md">
+                <span className="text-white drop-shadow-md">
                   Anime Library
                 </span>
               </h1>
-              <p className="text-lg sm:text-xl md:text-2xl text-foreground/90 max-w-2xl mx-auto drop-shadow-md px-4 sm:px-0">
+              <p className="text-lg sm:text-xl md:text-2xl text-white/95 max-w-2xl mx-auto drop-shadow-md px-4 sm:px-0">
                 Discover, track, and organize your anime and manga collection
                 with style. Join thousands of otaku in building the perfect
                 digital library.
@@ -145,7 +144,7 @@ export default function Index() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up">
               <Button
                 size="lg"
-                className="bg-anime-gradient hover:opacity-90 text-white font-semibold px-8"
+                className="bg-primary hover:bg-primary/90 text-white font-semibold px-8"
                 onClick={handleExploreClick}
               >
                 <Play className="w-5 h-5 mr-2" />
@@ -154,7 +153,7 @@ export default function Index() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary/20 hover:bg-primary/5"
+                className="border-0 hover:bg-primary/5"
                 onClick={handleLibraryClick}
               >
                 <BookOpen className="w-5 h-5 mr-2" />
@@ -164,27 +163,27 @@ export default function Index() {
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-12 sm:mt-16 animate-fade-in-up px-4 sm:px-0">
-              <GlassCard className="text-center p-4 sm:p-6 backdrop-blur-xl bg-background/30 border-white/20">
-                <div className="text-2xl sm:text-3xl font-bold gradient-text-subtle">
+              <GlassCard className="text-center p-4 sm:p-6 backdrop-blur-xl bg-white/50 dark:bg-background/30 border-white/20">
+                <div className="text-2xl sm:text-3xl font-bold text-primary">
                   10K+
                 </div>
-                <div className="text-sm sm:text-base text-foreground/80">
+                <div className="text-sm sm:text-base text-foreground dark:text-white/90">
                   Anime & Manga
                 </div>
               </GlassCard>
-              <GlassCard className="text-center p-4 sm:p-6 backdrop-blur-xl bg-background/30 border-white/20">
-                <div className="text-2xl sm:text-3xl font-bold gradient-text-subtle">
+              <GlassCard className="text-center p-4 sm:p-6 backdrop-blur-xl bg-white/50 dark:bg-background/30 border-white/20">
+                <div className="text-2xl sm:text-3xl font-bold text-secondary">
                   500K+
                 </div>
-                <div className="text-sm sm:text-base text-foreground/80">
+                <div className="text-sm sm:text-base text-foreground dark:text-white/90">
                   Happy Users
                 </div>
               </GlassCard>
-              <GlassCard className="text-center p-4 sm:p-6 backdrop-blur-xl bg-background/30 border-white/20">
-                <div className="text-2xl sm:text-3xl font-bold gradient-text-subtle">
+              <GlassCard className="text-center p-4 sm:p-6 backdrop-blur-xl bg-white/50 dark:bg-background/30 border-white/20">
+                <div className="text-2xl sm:text-3xl font-bold text-accent">
                   1M+
                 </div>
-                <div className="text-sm sm:text-base text-foreground/80">
+                <div className="text-sm sm:text-base text-foreground dark:text-white/90">
                   Reviews
                 </div>
               </GlassCard>
@@ -239,7 +238,7 @@ export default function Index() {
       </section>
 
       {/* Trending Section */}
-      <section className="py-16 bg-gradient-to-r from-background/50 to-background-secondary/50">
+      <section className="py-16 bg-background-secondary">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
@@ -287,7 +286,7 @@ export default function Index() {
                           alt={anime.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
                           <div className="absolute bottom-2 left-2 right-2">
                             <h3 className="text-white text-sm font-medium line-clamp-2">
                               {anime.title}
@@ -332,7 +331,7 @@ export default function Index() {
                 variant="hover"
                 className="p-8 text-center space-y-4 h-full"
               >
-                <div className="w-16 h-16 bg-anime-gradient rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                   <Play className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold">Discover New Anime</h3>
@@ -348,7 +347,7 @@ export default function Index() {
                 variant="hover"
                 className="p-8 text-center space-y-4 h-full"
               >
-                <div className="w-16 h-16 bg-gradient-to-r from-secondary to-accent rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                   <BookOpen className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold">Build Your Library</h3>
@@ -364,7 +363,7 @@ export default function Index() {
                 variant="hover"
                 className="p-8 text-center space-y-4 h-full"
               >
-                <div className="w-16 h-16 bg-gradient-to-r from-accent to-primary rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                   <Star className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold">Rate & Review</h3>

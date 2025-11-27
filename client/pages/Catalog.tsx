@@ -86,7 +86,7 @@ export default function Catalog() {
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-          <span className="gradient-text">Anime & Manga</span> Catalog
+          <span className="text-primary">Anime & Manga</span> Catalog
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
           Discover your next favorite anime or manga from our extensive collection
@@ -347,7 +347,7 @@ export default function Catalog() {
               <Button
                 onClick={loadMore}
                 disabled={loading}
-                className="bg-anime-gradient hover:opacity-90 text-white"
+                className="bg-primary hover:opacity-90 text-white"
               >
                 {loading ? (
                   <>

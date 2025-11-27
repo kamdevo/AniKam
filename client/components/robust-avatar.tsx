@@ -65,7 +65,7 @@ export function RobustAvatar({
           referrerPolicy="no-referrer"
         />
       )}
-      <AvatarFallback className="bg-anime-gradient text-white text-sm font-medium">
+      <AvatarFallback className="bg-primary text-white text-sm font-medium">
         {/* Show emoji if it's not a URL, otherwise show initials */}
         {src && !src.startsWith('http') ? src : fallback}
       </AvatarFallback>

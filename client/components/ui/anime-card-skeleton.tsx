@@ -6,7 +6,7 @@ export function AnimeCardSkeleton() {
     <GlassCard className="overflow-hidden animate-pulse group relative h-[420px] flex flex-col">
       {/* Cover Image Skeleton */}
       <div className="relative h-[280px] overflow-hidden flex-shrink-0">
-        <Skeleton className="w-full h-full bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
+        <Skeleton className="w-full h-full bg-muted animate-shimmer" />
 
         {/* Type and Status badges skeleton */}
         <div className="absolute top-2 left-2 flex gap-1">
@@ -60,7 +60,7 @@ export function TrendingCardSkeleton() {
   return (
     <GlassCard className="overflow-hidden animate-pulse group relative">
       <div className="aspect-[3/4] relative overflow-hidden rounded-lg">
-        <Skeleton className="w-full h-full bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
+        <Skeleton className="w-full h-full bg-muted animate-shimmer" />
 
         {/* Badge skeleton */}
         <div className="absolute top-2 left-2">

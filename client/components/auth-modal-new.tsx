@@ -211,7 +211,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     <CustomModal isOpen={isOpen} onClose={onClose}>
       <GlassCard className="relative overflow-hidden">
         {/* Animated background */}
-        <div className="absolute inset-0 bg-anime-gradient opacity-5">
+        <div className="absolute inset-0 bg-primary opacity-5">
           <motion.div
             animate={{
               backgroundPosition: ["0% 0%", "100% 100%"],
@@ -221,7 +221,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               repeat: Infinity,
               repeatType: "reverse",
             }}
-            className="w-full h-full bg-gradient-to-br from-purple-600/20 via-blue-600/20 to-pink-600/20"
+            className="w-full h-full bg-primary/10"
           />
         </div>
 
@@ -253,11 +253,11 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                 repeat: Infinity,
                 repeatType: "reverse",
               }}
-              className="w-16 h-16 bg-anime-gradient rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
+              className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
             >
               <span className="text-white font-bold text-2xl">🧩</span>
             </motion.div>
-            <h2 className="text-2xl font-bold gradient-text mb-2">
+            <h2 className="text-2xl font-bold text-primary mb-2">
               Welcome to AniKam
             </h2>
             <p className="text-muted-foreground text-sm">
@@ -275,7 +275,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             <Button
               onClick={handleDemoLogin}
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-medium"
+              className="w-full bg-warning hover:bg-warning/90 text-white font-medium"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               Try Demo Account
@@ -288,9 +288,9 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
           {/* Divider */}
           <div className="flex items-center my-4">
-            <div className="flex-1 border-t border-glass-border/50" />
+            <div className="flex-1 border-t border-0" />
             <span className="px-3 text-xs text-muted-foreground">or</span>
-            <div className="flex-1 border-t border-glass-border/50" />
+            <div className="flex-1 border-t border-0" />
           </div>
 
           {/* Tabs */}
@@ -341,7 +341,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                               }));
                           }}
                           className={cn(
-                            "pl-10 bg-glass/50 border-glass-border/50 focus:bg-glass/80 transition-all",
+                            "pl-10 bg-glass/50 border-0 focus:bg-glass/80 transition-all",
                             errors.email && "border-red-500"
                           )}
                           required
@@ -385,7 +385,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                               }));
                           }}
                           className={cn(
-                            "pl-10 pr-10 bg-glass/50 border-glass-border/50 focus:bg-glass/80 transition-all",
+                            "pl-10 pr-10 bg-glass/50 border-0 focus:bg-glass/80 transition-all",
                             errors.password && "border-red-500"
                           )}
                           required
@@ -423,7 +423,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                     <label className="flex items-center space-x-2 cursor-pointer">
                       <input
                         type="checkbox"
-                        className="rounded border-glass-border/50"
+                        className="rounded border-0"
                       />
                       <span className="text-muted-foreground">Remember me</span>
                     </label>
@@ -438,7 +438,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                   <motion.div variants={itemVariants}>
                     <Button
                       type="submit"
-                      className="w-full bg-anime-gradient hover:opacity-90 text-white"
+                      className="w-full bg-primary hover:opacity-90 text-white"
                       disabled={isLoading}
                     >
                       {isLoading ? (
@@ -491,7 +491,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                               }));
                           }}
                           className={cn(
-                            "pl-10 bg-glass/50 border-glass-border/50 focus:bg-glass/80 transition-all",
+                            "pl-10 bg-glass/50 border-0 focus:bg-glass/80 transition-all",
                             errors.username && "border-red-500"
                           )}
                           required
@@ -535,7 +535,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                               }));
                           }}
                           className={cn(
-                            "pl-10 bg-glass/50 border-glass-border/50 focus:bg-glass/80 transition-all",
+                            "pl-10 bg-glass/50 border-0 focus:bg-glass/80 transition-all",
                             errors.email && "border-red-500"
                           )}
                           required
@@ -579,7 +579,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                               }));
                           }}
                           className={cn(
-                            "pl-10 pr-10 bg-glass/50 border-glass-border/50 focus:bg-glass/80 transition-all",
+                            "pl-10 pr-10 bg-glass/50 border-0 focus:bg-glass/80 transition-all",
                             errors.password && "border-red-500"
                           )}
                           required
@@ -638,7 +638,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                               }));
                           }}
                           className={cn(
-                            "pl-10 pr-10 bg-glass/50 border-glass-border/50 focus:bg-glass/80 transition-all",
+                            "pl-10 pr-10 bg-glass/50 border-0 focus:bg-glass/80 transition-all",
                             errors.confirmPassword && "border-red-500"
                           )}
                           required
@@ -694,7 +694,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                   <motion.div variants={itemVariants}>
                     <Button
                       type="submit"
-                      className="w-full bg-anime-gradient hover:opacity-90 text-white"
+                      className="w-full bg-primary hover:opacity-90 text-white"
                       disabled={isLoading}
                     >
                       {isLoading ? (
@@ -714,11 +714,11 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
           {/* Divider */}
           <div className="flex items-center my-6">
-            <div className="flex-1 border-t border-glass-border/50" />
+            <div className="flex-1 border-t border-0" />
             <span className="px-4 text-sm text-muted-foreground">
               Or continue with
             </span>
-            <div className="flex-1 border-t border-glass-border/50" />
+            <div className="flex-1 border-t border-0" />
           </div>
 
           {/* Social Auth */}
@@ -732,7 +732,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               variant="outline"
               onClick={() => handleSocialAuth("google")}
               disabled={isLoading}
-              className="bg-glass/30 border-glass-border/50 hover:bg-glass/50 transition-all"
+              className="bg-glass/30 border-0 hover:bg-glass/50 transition-all"
             >
               <Chrome className="w-4 h-4 mr-2" />
               Google
@@ -741,7 +741,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               variant="outline"
               onClick={() => handleSocialAuth("github")}
               disabled={isLoading}
-              className="bg-glass/30 border-glass-border/50 hover:bg-glass/50 transition-all"
+              className="bg-glass/30 border-0 hover:bg-glass/50 transition-all"
             >
               <Github className="w-4 h-4 mr-2" />
               GitHub

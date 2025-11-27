@@ -25,7 +25,7 @@ export function ScrollProgress() {
   return (
     <div className="fixed top-16 left-0 right-0 z-40 h-1 bg-background/20 backdrop-blur-sm">
       <div
-        className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 transition-all duration-300 ease-out relative"
+        className="h-full bg-primary transition-all duration-300 ease-out relative"
         style={{
           width: `${scrollProgress}%`,
           boxShadow:
@@ -33,8 +33,8 @@ export function ScrollProgress() {
         }}
       >
         {/* Glowing effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 opacity-50 blur-sm" />
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500" />
+        <div className="absolute inset-0 bg-primary/50 opacity-50 blur-sm" />
+        <div className="absolute inset-0 bg-primary" />
       </div>
     </div>
   );

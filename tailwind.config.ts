@@ -37,10 +37,17 @@ export default {
         background: {
           DEFAULT: "hsl(var(--background))",
           secondary: "hsl(var(--background-secondary))",
+          tertiary: "hsl(var(--background-tertiary))",
+          elevated: "hsl(var(--background-elevated))",
         },
-        foreground: "hsl(var(--foreground))",
+        foreground: {
+          DEFAULT: "hsl(var(--foreground))",
+          secondary: "hsl(var(--foreground-secondary))",
+          tertiary: "hsl(var(--foreground-tertiary))",
+        },
         glass: {
-          DEFAULT: "hsl(var(--glass))",
+          base: "hsl(var(--glass-base))",
+          elevated: "hsl(var(--glass-elevated))",
           foreground: "hsl(var(--glass-foreground))",
           border: "hsl(var(--glass-border))",
         },
@@ -48,16 +55,21 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
           light: "hsl(var(--primary-light))",
+          lighter: "hsl(var(--primary-lighter))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
           light: "hsl(var(--secondary-light))",
+          lighter: "hsl(var(--secondary-lighter))",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
           light: "hsl(var(--accent-light))",
+          lighter: "hsl(var(--accent-lighter))",
+          soft: "hsl(var(--accent-soft))",
+          "soft-foreground": "hsl(var(--accent-soft-foreground))",
         },
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
@@ -78,15 +90,7 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "anime-gradient":
-          "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%, hsl(var(--accent)) 100%)",
-        "glass-gradient":
-          "linear-gradient(135deg, hsl(var(--glass) / 0.4) 0%, hsl(var(--glass) / 0.1) 100%)",
-      },
+      /* Removed gradient definitions - using solid colors only */
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

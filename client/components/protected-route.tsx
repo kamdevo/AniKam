@@ -13,9 +13,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-anime-gradient rounded-full flex items-center justify-center mx-auto animate-pulse">
+          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto animate-pulse">
             <span className="text-white font-bold text-2xl">🧩</span>
           </div>
           <div className="space-y-2">

@@ -109,7 +109,7 @@ export default function AuthCallback() {
   // Show error state if there's an error
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-red-900 dark:to-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-destructive/5 dark:bg-destructive/10">
         <div className="text-center p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-red-200">
           <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-red-600 text-2xl">⚠️</span>

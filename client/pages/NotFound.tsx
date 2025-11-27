@@ -11,7 +11,7 @@ export default function NotFound() {
           <div className="text-8xl">😵</div>
           
           <div className="space-y-2">
-            <h1 className="text-4xl font-bold gradient-text">404</h1>
+            <h1 className="text-4xl font-bold text-primary">404</h1>
             <h2 className="text-xl font-semibold">Page Not Found</h2>
             <p className="text-muted-foreground">
               Looks like this page got lost in another dimension. Even our best anime detectives couldn't find it!

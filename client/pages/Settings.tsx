@@ -88,7 +88,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <motion.div
@@ -96,7 +96,7 @@ export default function Settings() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl font-bold gradient-text mb-2">Configuración</h1>
+          <h1 className="text-3xl font-bold text-primary mb-2">Configuración</h1>
           <p className="text-muted-foreground">
             Personaliza tu experiencia en AniKam
           </p>

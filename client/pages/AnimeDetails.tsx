@@ -27,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnimeMedia, UserStatus, getUserStatusLabel } from "@shared/anime";
 import { useAnimeDetails } from "@/hooks/use-anime-data";
 import { LibraryStorage } from "@/lib/library-storage";
@@ -132,7 +131,7 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
           alt={anime.title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+        <div className="absolute inset-0 bg-black/60" />
 
         {/* Back Button */}
         <Button
@@ -155,24 +154,16 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
                   alt={anime.title}
                   className="w-32 h-48 sm:w-40 sm:h-60 md:w-48 md:h-72 object-cover rounded-xl shadow-2xl transition-transform group-hover:scale-105"
                 />
-                {anime.trailer && (
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <Play className="w-8 h-8 mx-auto mb-2" />
-                      <p className="text-sm font-medium">Watch Trailer</p>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Title and Basic Info */}
               <div className="flex-1 space-y-4">
                 <div>
-                  <h1 className="text-4xl md:text-6xl font-bold text-white mb-2">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2">
                     {anime.title}
                   </h1>
                   {anime.titleJapanese && (
-                    <h2 className="text-xl text-white/80 mb-2">
+                    <h2 className="text-lg sm:text-xl text-white/80 mb-2">
                       {anime.titleJapanese}
                     </h2>
                   )}
@@ -185,13 +176,13 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
                     </Badge>
                     <Badge
                       variant="outline"
-                      className="border-white/30 text-white"
+                      className="border-white/30 text-white bg-white/10"
                     >
                       {anime.ageRating}
                     </Badge>
                     <Badge
                       variant="outline"
-                      className="border-white/30 text-white"
+                      className="border-white/30 text-white bg-white/10"
                     >
                       {anime.releaseYear}
                     </Badge>
@@ -199,25 +190,25 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
                 </div>
 
                 {/* Quick Stats */}
-                <div className="flex flex-wrap gap-6 text-white">
+                <div className="flex flex-wrap gap-4 sm:gap-6 text-white text-sm sm:text-base">
                   <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
                     <span className="font-semibold">{anime.rating}</span>
                   </div>
                   {anime.episodes && (
                     <div className="flex items-center gap-2">
-                      <Tv className="w-5 h-5" />
+                      <Tv className="w-4 h-4 sm:w-5 sm:h-5" />
                       <span>{anime.episodes} episodes</span>
                     </div>
                   )}
                   {anime.duration && (
                     <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5" />
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
                       <span>{anime.duration} min</span>
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>
                       {anime.status.charAt(0).toUpperCase() +
                         anime.status.slice(1)}
@@ -228,7 +219,7 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
                 {/* Library Actions */}
                 <AuthRequiredWrapper onSuccess={() => {}}>
                   {({ executeAction, isAuthenticated }) => (
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex flex-wrap gap-3 sm:gap-4">
                       {!isInLibrary ? (
                         <>
                           <Select
@@ -259,7 +250,7 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
                                 executeAction(handleAddToLibrary);
                               }
                             }}
-                            className="bg-anime-gradient hover:opacity-90 text-white"
+                            className="bg-primary hover:bg-primary/90 text-white"
                             title={
                               !isAuthenticated
                                 ? "Sign in to add to library"
@@ -310,285 +301,301 @@ export default function AnimeDetails({ type }: AnimeDetailsProps) {
         </div>
       </div>
 
-      {/* Details Content */}
-      <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-5 max-w-2xl">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="episodes">Episodes</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
-            <TabsTrigger value="trailer">Trailer</TabsTrigger>
-          </TabsList>
+      {/* Unified Content Layout */}
+      <div className="container mx-auto px-4 py-8 sm:py-12 space-y-8">
+        {/* Synopsis */}
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Synopsis</h2>
+          <GlassCard className="p-6">
+            <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
+              {anime.synopsis}
+            </p>
+          </GlassCard>
+        </section>
 
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Synopsis */}
-              <div className="lg:col-span-2 space-y-6">
-                <GlassCard className="p-6">
-                  <h3 className="text-2xl font-bold mb-4">Synopsis</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {anime.synopsis}
-                  </p>
-                </GlassCard>
-
-                {/* Genres */}
-                <GlassCard className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Genres</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {anime.genres.map((genre) => (
-                      <Badge
-                        key={genre}
-                        variant="outline"
-                        className="border-primary/20 text-primary"
-                      >
-                        {genre}
-                      </Badge>
-                    ))}
+        {/* Information Grid */}
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Information</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Details */}
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* Basic Information */}
+              <GlassCard className="p-6">
+                <h3 className="text-lg font-semibold mb-4 text-primary">
+                  Details
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between items-start">
+                    <span className="text-muted-foreground">Type</span>
+                    <span className="font-medium text-right">
+                      {anime.type.toUpperCase()}
+                    </span>
                   </div>
-                </GlassCard>
-
-                {/* Tags */}
-                <GlassCard className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {anime.tags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant="secondary"
-                        className="bg-secondary/10"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </GlassCard>
-              </div>
-
-              {/* Side Info */}
-              <div className="space-y-6">
-                {/* Statistics */}
-                <GlassCard className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Statistics</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Rating</span>
-                      <span className="font-semibold">{anime.rating}/10</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Popularity</span>
-                      <span className="font-semibold">#{anime.popularity}</span>
-                    </div>
-                    {anime.malScore && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">MAL Score</span>
-                        <span className="font-semibold">{anime.malScore}</span>
-                      </div>
-                    )}
-                  </div>
-                </GlassCard>
-
-                {/* Production Info */}
-                <GlassCard className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Production</h3>
-                  <div className="space-y-3">
-                    {anime.studio && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Studio</span>
-                        <span className="font-semibold">{anime.studio}</span>
-                      </div>
-                    )}
-                    {anime.director && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Director</span>
-                        <span className="font-semibold">{anime.director}</span>
-                      </div>
-                    )}
-                    {anime.source && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Source</span>
-                        <span className="font-semibold">{anime.source}</span>
-                      </div>
-                    )}
-                  </div>
-                </GlassCard>
-
-                {/* Where to Watch */}
-                <GlassCard className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Where to Watch</h3>
-                  <div className="space-y-2">
-                    {anime.platforms.map((platform) => (
-                      <Button
-                        key={platform}
-                        variant="outline"
-                        className="w-full justify-between hover:bg-primary/5 transition-colors"
-                      >
-                        {platform}
-                        <ExternalLink className="w-4 h-4" />
-                      </Button>
-                    ))}
-                  </div>
-                </GlassCard>
-
-                {/* User Score */}
-                <GlassCard className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Your Rating</h3>
-                  <div className="flex items-center gap-2 mb-4">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
-                      <button
-                        key={star}
-                        className="w-6 h-6 text-yellow-400 hover:text-yellow-300 transition-colors"
-                      >
-                        <Star className="w-full h-full fill-current" />
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Rate this anime to help others discover great content!
-                  </p>
-                </GlassCard>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Details Tab */}
-          <TabsContent value="details">
-            <GlassCard className="p-6">
-              <h3 className="text-2xl font-bold mb-6">Detailed Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Original Title
-                    </label>
-                    <p className="font-semibold">
-                      {anime.titleJapanese || anime.title}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      English Title
-                    </label>
-                    <p className="font-semibold">
-                      {anime.titleEnglish || anime.title}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Type
-                    </label>
-                    <p className="font-semibold">{anime.type.toUpperCase()}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Status
-                    </label>
-                    <p className="font-semibold">
+                  <div className="flex justify-between items-start">
+                    <span className="text-muted-foreground">Status</span>
+                    <span className="font-medium text-right">
                       {anime.status.charAt(0).toUpperCase() +
                         anime.status.slice(1)}
-                    </p>
+                    </span>
                   </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Release Year
-                    </label>
-                    <p className="font-semibold">{anime.releaseYear}</p>
-                  </div>
-                  {anime.endYear && (
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">
-                        End Year
-                      </label>
-                      <p className="font-semibold">{anime.endYear}</p>
-                    </div>
-                  )}
                   {anime.episodes && (
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Episodes
-                      </label>
-                      <p className="font-semibold">{anime.episodes}</p>
+                    <div className="flex justify-between items-start">
+                      <span className="text-muted-foreground">Episodes</span>
+                      <span className="font-medium text-right">
+                        {anime.episodes}
+                      </span>
                     </div>
                   )}
                   {anime.seasons && (
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Seasons
-                      </label>
-                      <p className="font-semibold">{anime.seasons}</p>
+                    <div className="flex justify-between items-start">
+                      <span className="text-muted-foreground">Seasons</span>
+                      <span className="font-medium text-right">
+                        {anime.seasons}
+                      </span>
                     </div>
                   )}
                   {anime.duration && (
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Episode Duration
-                      </label>
-                      <p className="font-semibold">{anime.duration} minutes</p>
+                    <div className="flex justify-between items-start">
+                      <span className="text-muted-foreground">Duration</span>
+                      <span className="font-medium text-right">
+                        {anime.duration} min
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-start">
+                    <span className="text-muted-foreground">Release Year</span>
+                    <span className="font-medium text-right">
+                      {anime.releaseYear}
+                    </span>
+                  </div>
+                  {anime.endYear && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-muted-foreground">End Year</span>
+                      <span className="font-medium text-right">
+                        {anime.endYear}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-start">
+                    <span className="text-muted-foreground">Age Rating</span>
+                    <span className="font-medium text-right">
+                      {anime.ageRating}
+                    </span>
+                  </div>
+                </div>
+              </GlassCard>
+
+              {/* Production Info */}
+              <GlassCard className="p-6">
+                <h3 className="text-lg font-semibold mb-4 text-secondary">
+                  Production
+                </h3>
+                <div className="space-y-3 text-sm">
+                  {anime.studio && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-muted-foreground">Studio</span>
+                      <span className="font-medium text-right">
+                        {anime.studio}
+                      </span>
+                    </div>
+                  )}
+                  {anime.director && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-muted-foreground">Director</span>
+                      <span className="font-medium text-right">
+                        {anime.director}
+                      </span>
+                    </div>
+                  )}
+                  {anime.source && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-muted-foreground">Source</span>
+                      <span className="font-medium text-right">
+                        {anime.source}
+                      </span>
+                    </div>
+                  )}
+                  {anime.titleEnglish && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-muted-foreground">
+                        English Title
+                      </span>
+                      <span className="font-medium text-right">
+                        {anime.titleEnglish}
+                      </span>
                     </div>
                   )}
                 </div>
+              </GlassCard>
+            </div>
+
+            {/* Statistics Sidebar */}
+            <div className="space-y-6">
+              <GlassCard className="p-6">
+                <h3 className="text-lg font-semibold mb-4 text-accent">
+                  Statistics
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Rating</span>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="font-semibold">{anime.rating}/10</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Popularity</span>
+                    <span className="font-semibold">#{anime.popularity}</span>
+                  </div>
+                  {anime.malScore && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">MAL Score</span>
+                      <span className="font-semibold">{anime.malScore}</span>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
+
+              {/* User Rating */}
+              <GlassCard className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Your Rating</h3>
+                <div className="flex flex-wrap gap-1 mb-4">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                    <button
+                      key={star}
+                      className="w-6 h-6 text-yellow-400 hover:text-yellow-300 transition-colors"
+                      title={`Rate ${star}/10`}
+                    >
+                      <Star className="w-full h-full fill-current" />
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Rate this anime to help others discover great content!
+                </p>
+              </GlassCard>
+            </div>
+          </div>
+        </section>
+
+        {/* Genres and Tags */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <GlassCard className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Genres</h3>
+            <div className="flex flex-wrap gap-2">
+              {anime.genres.map((genre) => (
+                <Badge
+                  key={genre}
+                  className="bg-primary/10 text-primary border border-0"
+                >
+                  {genre}
+                </Badge>
+              ))}
+            </div>
+          </GlassCard>
+
+          <GlassCard className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              {anime.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="bg-secondary/10 text-secondary"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </GlassCard>
+        </section>
+
+        {/* Where to Watch */}
+        {anime.platforms && anime.platforms.length > 0 && (
+          <section>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+              Where to Watch
+            </h2>
+            <GlassCard className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {anime.platforms.map((platform) => (
+                  <Button
+                    key={platform}
+                    variant="outline"
+                    className="w-full justify-between hover:bg-primary/5 hover:border-primary/30 transition-colors"
+                  >
+                    <span>{platform}</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
+                ))}
               </div>
             </GlassCard>
-          </TabsContent>
+          </section>
+        )}
 
-          {/* Episodes Tab */}
-          <TabsContent value="episodes">
-            <GlassCard className="p-6">
-              <h3 className="text-2xl font-bold mb-6">Episodes</h3>
-              <p className="text-muted-foreground">
-                Episode list functionality coming soon! This will include
-                individual episode information, progress tracking, and
-                episode-specific ratings.
-              </p>
-            </GlassCard>
-          </TabsContent>
+        {/* Episodes Section (Placeholder) */}
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Episodes</h2>
+          <GlassCard className="p-8 text-center">
+            <div className="text-4xl mb-3">📺</div>
+            <h3 className="text-lg font-semibold mb-2">Coming Soon</h3>
+            <p className="text-muted-foreground text-sm">
+              Episode list functionality is in development. This will include
+              individual episode information, progress tracking, and
+              episode-specific ratings.
+            </p>
+          </GlassCard>
+        </section>
 
-          {/* Reviews Tab */}
-          <TabsContent value="reviews">
-            <GlassCard className="p-6">
-              <h3 className="text-2xl font-bold mb-6">Reviews & Ratings</h3>
-              <p className="text-muted-foreground">
-                Community reviews and ratings coming soon! Users will be able to
-                write detailed reviews and rate individual aspects of the anime.
-              </p>
-            </GlassCard>
-          </TabsContent>
+        {/* Reviews Section (Placeholder) */}
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+            Community Reviews
+          </h2>
+          <GlassCard className="p-8 text-center">
+            <div className="text-4xl mb-3">💬</div>
+            <h3 className="text-lg font-semibold mb-2">Coming Soon</h3>
+            <p className="text-muted-foreground text-sm">
+              Community reviews and ratings are in development. Users will be
+              able to write detailed reviews and rate individual aspects of the
+              anime.
+            </p>
+          </GlassCard>
+        </section>
 
-          {/* Trailer Tab */}
-          <TabsContent value="trailer">
-            <GlassCard className="p-6">
-              <h3 className="text-2xl font-bold mb-6">Official Trailer</h3>
-              {anime.trailer ? (
-                <div className="relative bg-black rounded-lg overflow-hidden w-full aspect-video">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={`https://www.youtube.com/embed/${anime.trailer}`}
-                    title="Anime Trailer"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="rounded-lg"
-                  />
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="text-6xl mb-4">🎬</div>
-                  <h4 className="text-xl font-semibold mb-2">
-                    No Trailer Available
-                  </h4>
-                  <p className="text-muted-foreground">
-                    The official trailer for this anime is not currently
-                    available.
-                  </p>
-                </div>
-              )}
-            </GlassCard>
-          </TabsContent>
-        </Tabs>
+        {/* Official Trailer - Last Section */}
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+            Official Trailer
+          </h2>
+          <GlassCard className="p-6">
+            {anime.trailer ? (
+              <div className="relative bg-black rounded-lg overflow-hidden w-full aspect-video">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${anime.trailer}`}
+                  title="Anime Trailer"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="rounded-lg"
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="text-5xl mb-3">🎬</div>
+                <h3 className="text-lg font-semibold mb-2">
+                  No Trailer Available
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  The official trailer for this anime is not currently
+                  available.
+                </p>
+              </div>
+            )}
+          </GlassCard>
+        </section>
       </div>
     </div>
   );

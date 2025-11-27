@@ -85,7 +85,7 @@ export function AnimeCard({
               />
 
               {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
               {/* Format icon */}
               <div className="absolute top-2 left-2">
@@ -154,7 +154,7 @@ export function AnimeCard({
                   <Badge
                     key={genre}
                     variant="outline"
-                    className="text-xs px-1.5 sm:px-2 py-0.5 border-primary/20 text-primary/80"
+                    className="text-xs px-1.5 sm:px-2 py-0.5 border-0 text-primary/80"
                   >
                     {genre}
                   </Badge>
@@ -187,7 +187,7 @@ export function AnimeCard({
                   <div className="space-y-1">
                     <div className="w-full bg-muted rounded-full h-1.5">
                       <div
-                        className="bg-gradient-to-r from-primary to-secondary h-1.5 rounded-full transition-all duration-300"
+                        className="bg-primary h-1.5 rounded-full transition-all duration-300"
                         style={{
                           width: `${((libraryItem?.userProgress || anime.userProgress || 0) / (anime.episodes || anime.chapters || 1)) * 100}%`,
                         }}

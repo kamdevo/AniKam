@@ -6,103 +6,134 @@
 
 @layer base {
   /**
-   * AniShelf - Anime-inspired glassmorphism theme
-   * Purple-blue gradients with cyan accents
+   * AniKam - Layered color system with proper elevation
+   * Following the Foundation & Hierarchy Principle:
+   * - Darker shades = deeper/background
+   * - Lighter shades = elevated/important
+   * - Lightness increments of ~10% for clear visual hierarchy
    */
   :root {
-    /* Background gradients - Light theme: rgb(255, 255, 255) */
-    --background: 0 0% 100%;
-    --background-secondary: 0 0% 98%;
-    --foreground: 235 15% 15%;
+    /* Background Layers - Light theme (lightest to darkest for layering) */
+    --background: 240 30% 99%; /* Base - Lightest (almost white with subtle tint) */
+    --background-secondary: 240 30% 98%; /* Layer 1 - Slightly deeper */
+    --background-tertiary: 240 30% 96%; /* Layer 2 - More depth */
+    --background-elevated: 0 0% 100%; /* Elevated elements - Pure white */
+    
+    /* Foreground - Text colors */
+    --foreground: 235 15% 15%; /* Primary text - Dark for contrast */
+    --foreground-secondary: 235 15% 35%; /* Secondary text */
+    --foreground-tertiary: 235 15% 55%; /* Tertiary/muted text */
 
-    /* Glass cards */
-    --glass: 240 30% 96%;
+    /* Glass effect layers (for overlays and cards) */
+    --glass-base: 240 30% 98%;
+    --glass-elevated: 0 0% 100%;
     --glass-foreground: 235 15% 20%;
-    --glass-border: 240 20% 80%;
+    --glass-border: 240 20% 90%; /* Subtle border when needed */
 
-    /* Primary - Purple */
-    --primary: 260 84% 60%;
+    /* Primary - Deep Purple with shades */
+    --primary: 268 83% 23%; /* Base primary */
+    --primary-light: 268 83% 35%; /* Elevated/hover */
+    --primary-lighter: 268 83% 45%; /* More elevated */
     --primary-foreground: 0 0% 100%;
-    --primary-light: 260 84% 70%;
 
-    /* Secondary - Blue */
-    --secondary: 220 100% 70%;
+    /* Secondary - Deep Blue with shades */
+    --secondary: 205 91% 27%; /* Base secondary */
+    --secondary-light: 205 91% 40%; /* Elevated */
+    --secondary-lighter: 205 91% 50%; /* More elevated */
     --secondary-foreground: 0 0% 100%;
-    --secondary-light: 220 100% 80%;
 
-    /* Accent - Cyan */
-    --accent: 180 100% 70%;
-    --accent-foreground: 235 15% 15%;
-    --accent-light: 180 100% 80%;
+    /* Accent - Teal with shades */
+    --accent: 185 81% 30%; /* Base accent */
+    --accent-light: 185 81% 45%; /* Elevated */
+    --accent-lighter: 185 81% 55%; /* More elevated */
+    --accent-foreground: 0 0% 100%;
+
+    /* Soft Accent - Mint */
+    --accent-soft: 176 32% 60%;
+    --accent-soft-foreground: 235 15% 15%;
 
     /* Status colors */
-    --success: 140 70% 60%;
-    --warning: 45 100% 65%;
+    --success: 140 70% 45%;
+    --warning: 45 95% 55%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Muted colors */
-    --muted: 240 15% 90%;
-    --muted-foreground: 235 15% 45%;
+    /* Muted colors with layers */
+    --muted: 240 20% 94%; /* Base muted background */
+    --muted-foreground: 235 15% 45%; /* Muted text */
 
-    /* UI elements */
-    --border: 240 20% 85%;
-    --input: 240 20% 90%;
-    --ring: 260 84% 60%;
+    /* UI elements - minimal borders, rely on color layering */
+    --border: 240 20% 92%; /* Subtle when needed */
+    --input: 240 20% 96%; /* Input background */
+    --ring: 268 83% 23%; /* Focus ring */
     --radius: 0.75rem;
 
-    /* Card variants */
-    --card: 0 0% 100%;
+    /* Card variants - using layering */
+    --card: 0 0% 100%; /* Elevated card - white */
     --card-foreground: 235 15% 15%;
-    --popover: 0 0% 100%;
+    --popover: 0 0% 100%; /* Elevated popover */
     --popover-foreground: 235 15% 15%;
   }
 
   .dark {
-    /* Dark background gradients - Dark theme: rgb(20, 20, 20) */
-    --background: 0 0% 8%;
-    --background-secondary: 0 0% 6%;
-    --foreground: 240 15% 85%;
+    /* Dark background layers - darkest to lightest for layering */
+    --background: 0 0% 8%; /* Base - Darkest */
+    --background-secondary: 0 0% 10%; /* Layer 1 - Slightly lighter */
+    --background-tertiary: 0 0% 12%; /* Layer 2 - More elevated */
+    --background-elevated: 0 0% 14%; /* Elevated elements */
 
-    /* Dark glass cards */
-    --glass: 240 15% 12%;
+    /* Dark foreground */
+    --foreground: 240 15% 85%; /* Primary text */
+    --foreground-secondary: 240 15% 65%; /* Secondary text */
+    --foreground-tertiary: 240 15% 55%; /* Tertiary text */
+
+    /* Dark glass layers */
+    --glass-base: 240 15% 10%;
+    --glass-elevated: 240 15% 14%;
     --glass-foreground: 240 15% 85%;
-    --glass-border: 240 15% 25%;
+    --glass-border: 240 15% 20%;
 
-    /* Primary - Brighter purple for dark mode */
-    --primary: 260 84% 70%;
-    --primary-foreground: 235 25% 8%;
-    --primary-light: 260 84% 80%;
+    /* Primary - Lighter for dark mode */
+    --primary: 268 68% 55%;
+    --primary-light: 268 68% 65%;
+    --primary-lighter: 268 68% 75%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Bright blue */
-    --secondary: 220 100% 75%;
-    --secondary-foreground: 235 25% 8%;
-    --secondary-light: 220 100% 85%;
+    /* Secondary - Lighter for dark mode */
+    --secondary: 205 75% 55%;
+    --secondary-light: 205 75% 65%;
+    --secondary-lighter: 205 75% 75%;
+    --secondary-foreground: 0 0% 100%;
 
-    /* Accent - Bright cyan */
-    --accent: 180 100% 75%;
-    --accent-foreground: 235 25% 8%;
-    --accent-light: 180 100% 85%;
+    /* Accent - Lighter for dark mode */
+    --accent: 185 70% 45%;
+    --accent-light: 185 70% 55%;
+    --accent-lighter: 185 70% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Soft Accent */
+    --accent-soft: 176 32% 60%;
+    --accent-soft-foreground: 235 25% 8%;
 
     /* Status colors for dark */
-    --success: 140 70% 65%;
-    --warning: 45 100% 70%;
+    --success: 140 65% 50%;
+    --warning: 45 90% 60%;
     --destructive: 0 84% 65%;
-    --destructive-foreground: 235 25% 8%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Dark muted */
-    --muted: 240 15% 18%;
+    /* Dark muted with layers */
+    --muted: 240 15% 16%;
     --muted-foreground: 240 15% 55%;
 
     /* Dark UI elements */
-    --border: 240 15% 20%;
-    --input: 240 15% 15%;
-    --ring: 260 84% 70%;
+    --border: 240 15% 18%;
+    --input: 240 15% 12%;
+    --ring: 268 68% 55%;
 
-    /* Dark cards */
-    --card: 240 15% 10%;
+    /* Dark cards - using layering */
+    --card: 240 15% 12%;
     --card-foreground: 240 15% 85%;
-    --popover: 240 15% 10%;
+    --popover: 240 15% 12%;
     --popover-foreground: 240 15% 85%;
   }
 }
@@ -113,8 +144,7 @@
   }
 
   body {
-    @apply bg-gradient-to-br from-background via-background-secondary to-background text-foreground;
-    background-attachment: fixed;
+    @apply bg-background text-foreground;
     font-family:
       "Lexend Deca",
       -apple-system,
@@ -145,27 +175,83 @@
     -ms-overflow-style: none;
   }
 
-  /* Glassmorphism utilities */
+  /* Elevation System - Shadows for Depth Hierarchy */
+  /* Level 0: Base layer - no shadow */
+  .elevation-0 {
+    box-shadow: none;
+  }
+
+  /* Level 1: Slightly elevated - subtle depth */
+  .elevation-1 {
+    box-shadow:
+      0 1px 2px 0 rgb(0 0 0 / 0.05),
+      0 1px 3px 0 rgb(0 0 0 / 0.1);
+  }
+
+  /* Level 2: Raised - cards and content */
+  .elevation-2 {
+    box-shadow:
+      0 2px 4px -1px rgb(0 0 0 / 0.1),
+      0 4px 6px -1px rgb(0 0 0 / 0.15);
+  }
+
+  /* Level 3: Floating - modals and popovers */
+  .elevation-3 {
+    box-shadow:
+      0 4px 8px -2px rgb(0 0 0 / 0.15),
+      0 10px 15px -3px rgb(0 0 0 / 0.2);
+  }
+
+  /* Level 4: Overlay - top-level elements */
+  .elevation-4 {
+    box-shadow:
+      0 10px 20px -5px rgb(0 0 0 / 0.2),
+      0 20px 25px -5px rgb(0 0 0 / 0.25);
+  }
+
+  /* Glassmorphism utilities with layering and elevation */
   .glass {
-    @apply bg-glass/40 backdrop-blur-md border border-glass-border/30;
+    @apply bg-glass-base/40 backdrop-blur-md border-0 elevation-1;
   }
 
   .glass-card {
-    @apply glass rounded-xl shadow-lg shadow-primary/5;
+    @apply bg-glass-elevated/60 backdrop-blur-lg rounded-xl elevation-2;
   }
 
   .glass-nav {
-    @apply glass border-b border-glass-border/30 backdrop-blur-xl;
+    @apply bg-glass-elevated/90 backdrop-blur-xl border-0 elevation-3;
   }
 
-  /* Gradient text utilities */
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
+  /* Color-based elevation (no borders, only color layers) */
+  .layer-base {
+    @apply bg-background;
   }
 
-  .gradient-text-subtle {
-    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+  .layer-1 {
+    @apply bg-background-secondary;
   }
+
+  .layer-2 {
+    @apply bg-background-tertiary;
+  }
+
+  .layer-elevated {
+    @apply bg-background-elevated elevation-2;
+  }
+
+  /* Interactive elevation - grows on hover */
+  .elevation-interactive {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .elevation-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 20px -5px rgb(0 0 0 / 0.2),
+      0 20px 25px -5px rgb(0 0 0 / 0.25);
+  }
+
+  /* Removed gradient text utilities - using solid colors instead */
 
   /* Animation utilities */
   .animate-glow {
@@ -212,24 +298,17 @@
     @apply bg-primary;
   }
 
-  /* Shimmer animation for skeletons */
+  /* Shimmer animation for skeletons - using opacity pulse */
   @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
+    0%, 100% {
+      opacity: 0.4;
     }
-    100% {
-      background-position: 200% 0;
+    50% {
+      opacity: 0.6;
     }
   }
 
   .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+    animation: shimmer 2s ease-in-out infinite;
   }
 }

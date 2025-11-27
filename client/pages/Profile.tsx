@@ -151,109 +151,139 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-3xl font-bold gradient-text mb-2">Mi Perfil</h1>
-          <p className="text-muted-foreground">
-            Personaliza tu perfil y configuraciones
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-6 max-w-6xl">
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-4 bg-background-secondary h-12">
+            <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-background-elevated data-[state=active]:shadow-sm">
               <User className="w-4 h-4" />
-              Perfil
+              <span className="hidden sm:inline">Perfil</span>
             </TabsTrigger>
-            <TabsTrigger value="appearance" className="flex items-center gap-2">
+            <TabsTrigger value="appearance" className="flex items-center gap-2 data-[state=active]:bg-background-elevated data-[state=active]:shadow-sm">
               <Palette className="w-4 h-4" />
-              Apariencia
+              <span className="hidden sm:inline">Apariencia</span>
             </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
+            <TabsTrigger value="content" className="flex items-center gap-2 data-[state=active]:bg-background-elevated data-[state=active]:shadow-sm">
               <Shield className="w-4 h-4" />
-              Contenido
+              <span className="hidden sm:inline">Contenido</span>
             </TabsTrigger>
-            <TabsTrigger value="language" className="flex items-center gap-2">
+            <TabsTrigger value="language" className="flex items-center gap-2 data-[state=active]:bg-background-elevated data-[state=active]:shadow-sm">
               <Globe className="w-4 h-4" />
-              Idioma
+              <span className="hidden sm:inline">Idioma</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Perfil Tab - Customización completa */}
           <TabsContent value="profile">
             <div className="space-y-6">
-              {/* Banner y Avatar */}
-              <GlassCard className="relative overflow-hidden">
-                {/* Banner */}
-                <div className="relative h-48 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500">
-                  {user.banner && (
-                    <img
-                      src={user.banner}
-                      alt="Banner"
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                </div>
-
-                {/* Información del perfil */}
-                <div className="p-6 relative">
-                  {/* Avatar */}
-                  <div className="absolute -top-16 left-6">
-                    <div className="w-24 h-24 rounded-full bg-white dark:bg-gray-800 p-1 shadow-lg">
-                      <RobustAvatar
-                        src={user.avatar}
-                        fallback={getInitials(user.displayName || user.username)}
-                        alt="Profile Avatar"
-                        size="lg"
-                        className="w-full h-full"
+              {/* Banner y Avatar - Improved Structure */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative"
+              >
+                <GlassCard className="relative overflow-hidden bg-background-elevated border-0 shadow-lg">
+                  {/* Banner */}
+                  <div className="relative h-32 sm:h-48 bg-gradient-to-br from-primary via-secondary to-accent">
+                    {user.banner && (
+                      <img
+                        src={user.banner}
+                        alt="Banner"
+                        className="w-full h-full object-cover"
                       />
-                    </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                   </div>
 
-                  {/* Información básica */}
-                  <div className="ml-32 flex justify-between items-start">
-                    <div>
-                      <h1 className="text-2xl font-bold gradient-text">
-                        {user.displayName || user.username}
-                      </h1>
-                      <p className="text-muted-foreground">@{user.username}</p>
-                      {user.bio && (
-                        <p className="text-sm text-muted-foreground mt-2 max-w-md">
-                          {user.bio}
-                        </p>
-                      )}
+                  {/* Profile Info Section */}
+                  <div className="relative px-4 sm:px-6 pb-6">
+                    {/* Avatar */}
+                    <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 sm:-mt-16">
+                      <div className="relative">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-background-elevated p-1.5 shadow-xl ring-4 ring-background">
+                          <RobustAvatar
+                            src={user.avatar}
+                            fallback={getInitials(user.displayName || user.username)}
+                            alt="Profile Avatar"
+                            size="lg"
+                            className="w-full h-full rounded-xl"
+                          />
+                        </div>
+                      </div>
+
+                      {/* User Info */}
+                      <div className="flex-1 sm:mb-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                              {user.displayName || user.username}
+                            </h1>
+                            <p className="text-foreground-secondary text-sm sm:text-base">@{user.username}</p>
+                          </div>
+                          <Button
+                            onClick={() => {
+                              if (isEditing) {
+                                handleCancel();
+                              } else {
+                                setIsEditing(true);
+                              }
+                            }}
+                            variant={isEditing ? "outline" : "default"}
+                            className="w-full sm:w-auto"
+                          >
+                            {isEditing ? (
+                              <>
+                                <X className="w-4 h-4 mr-2" />
+                                Cancelar
+                              </>
+                            ) : (
+                              <>
+                                <Edit3 className="w-4 h-4 mr-2" />
+                                Editar Perfil
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                        
+                        {user.bio && (
+                          <p className="text-foreground-secondary mt-3 text-sm sm:text-base max-w-2xl">
+                            {user.bio}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <Button
-                      onClick={() => {
-                        if (isEditing) {
-                          handleCancel();
-                        } else {
-                          setIsEditing(true);
-                        }
-                      }}
-                      variant={isEditing ? "outline" : "default"}
-                    >
-                      {isEditing ? (
-                        <>
-                          <X className="w-4 h-4 mr-2" />
-                          Cancelar
-                        </>
-                      ) : (
-                        <>
-                          <Edit3 className="w-4 h-4 mr-2" />
-                          Editar Perfil
-                        </>
-                      )}
-                    </Button>
+
+                    {/* Stats Section */}
+                    <div className="grid grid-cols-3 gap-3 sm:gap-6 mt-6 pt-6 border-t border-border">
+                      <div className="text-center">
+                        <div className="text-2xl sm:text-3xl font-bold text-primary">
+                          {user.stats?.animeWatched || 0}
+                        </div>
+                        <div className="text-xs sm:text-sm text-foreground-tertiary mt-1">
+                          Anime
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl sm:text-3xl font-bold text-secondary">
+                          {user.stats?.mangaRead || 0}
+                        </div>
+                        <div className="text-xs sm:text-sm text-foreground-tertiary mt-1">
+                          Manga
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl sm:text-3xl font-bold text-accent">
+                          {user.stats?.totalRatings || 0}
+                        </div>
+                        <div className="text-xs sm:text-sm text-foreground-tertiary mt-1">
+                          Valoraciones
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </GlassCard>
+                </GlassCard>
+              </motion.div>
 
               {/* Secciones de Edición - Solo aparecen cuando isEditing es true */}
               <AnimatePresence>
@@ -266,9 +296,9 @@ export default function Profile() {
                       exit={{ opacity: 0, y: -20, height: 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <GlassCard className="p-6">
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <Upload className="w-5 h-5" />
+                      <GlassCard className="p-6 bg-background-elevated border-0 shadow-md">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
+                          <Upload className="w-5 h-5 text-primary" />
                           Banner de Perfil
                         </h3>
                         <FileUpload
@@ -290,9 +320,9 @@ export default function Profile() {
                       exit={{ opacity: 0, y: -20, height: 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut", delay: 0.1 }}
                     >
-                      <GlassCard className="p-6">
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <User className="w-5 h-5" />
+                      <GlassCard className="p-6 bg-background-elevated border-0 shadow-md">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
+                          <Camera className="w-5 h-5 text-primary" />
                           Avatar de Perfil
                         </h3>
                         <div className="flex items-center gap-6 mb-6">
@@ -319,13 +349,13 @@ export default function Profile() {
 
                         {/* Avatars predeterminados */}
                         <div>
-                          <Label className="text-sm font-medium mb-3 block">O elige un avatar predeterminado:</Label>
-                          <div className="grid grid-cols-10 gap-2">
+                          <Label className="text-sm font-medium mb-3 block text-foreground">O elige un avatar predeterminado:</Label>
+                          <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
                             {DEFAULT_ANIME_AVATARS.map((avatar, index) => (
                               <button
                                 key={index}
                                 onClick={() => handleAvatarSelect(avatar)}
-                                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center text-lg transition-colors"
+                                className="w-10 h-10 rounded-xl bg-background-secondary hover:bg-background-tertiary flex items-center justify-center text-lg transition-all hover:scale-110 border border-border"
                               >
                                 {avatar}
                               </button>
@@ -342,40 +372,42 @@ export default function Profile() {
                       exit={{ opacity: 0, y: -20, height: 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut", delay: 0.2 }}
                     >
-                      <GlassCard className="p-6">
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <Edit3 className="w-5 h-5" />
+                      <GlassCard className="p-6 bg-background-elevated border-0 shadow-md">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
+                          <Edit3 className="w-5 h-5 text-primary" />
                           Editar Información
                         </h3>
                         
                         <div className="space-y-4">
                           <div>
-                            <Label htmlFor="displayName">Nombre para mostrar</Label>
+                            <Label htmlFor="displayName" className="text-foreground">Nombre para mostrar</Label>
                             <Input
                               id="displayName"
                               value={formData.displayName}
                               onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
                               placeholder="Tu nombre completo"
+                              className="bg-background-secondary border-border focus:bg-background-tertiary"
                             />
                           </div>
 
                           <div>
-                            <Label htmlFor="bio">Biografía</Label>
+                            <Label htmlFor="bio" className="text-foreground">Biografía</Label>
                             <Textarea
                               id="bio"
                               value={formData.bio}
                               onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                               placeholder="Cuéntanos sobre ti..."
                               rows={3}
+                              className="bg-background-secondary border-border focus:bg-background-tertiary"
                             />
                           </div>
                         </div>
 
-                        <div className="flex justify-end gap-2 mt-6">
-                          <Button variant="outline" onClick={handleCancel}>
+                        <div className="flex flex-col sm:flex-row justify-end gap-2 mt-6">
+                          <Button variant="outline" onClick={handleCancel} className="w-full sm:w-auto">
                             Cancelar
                           </Button>
-                          <Button onClick={handleSave} disabled={isLoading}>
+                          <Button onClick={handleSave} disabled={isLoading} className="w-full sm:w-auto">
                             <Save className="w-4 h-4 mr-2" />
                             {isLoading ? "Guardando..." : "Guardar Cambios"}
                           </Button>
@@ -390,20 +422,20 @@ export default function Profile() {
 
           {/* Apariencia Tab */}
           <TabsContent value="appearance">
-            <GlassCard className="p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Palette className="w-5 h-5" />
+            <GlassCard className="p-6 bg-background-elevated border-0 shadow-md">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
+                <Palette className="w-5 h-5 text-primary" />
                 Preferencias de Apariencia
               </h3>
               
               <div className="space-y-6">
                 <div>
-                  <Label className="text-sm font-medium mb-3 block">Tema</Label>
+                  <Label className="text-sm font-medium mb-3 block text-foreground">Tema</Label>
                   <Select
                     value={formData.themePreference}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, themePreference: value as any }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-background-secondary border-border">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -412,7 +444,7 @@ export default function Profile() {
                       <SelectItem value="auto">🔄 Automático</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-foreground-tertiary mt-2">
                     El tema automático cambia según la configuración de tu sistema
                   </p>
                 </div>
@@ -429,20 +461,20 @@ export default function Profile() {
 
           {/* Contenido Tab */}
           <TabsContent value="content">
-            <GlassCard className="p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Shield className="w-5 h-5" />
+            <GlassCard className="p-6 bg-background-elevated border-0 shadow-md">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
+                <Shield className="w-5 h-5 text-primary" />
                 Filtros de Contenido
               </h3>
               
               <div className="space-y-6">
                 <div>
-                  <Label className="text-sm font-medium mb-3 block">Nivel de Filtro</Label>
+                  <Label className="text-sm font-medium mb-3 block text-foreground">Nivel de Filtro</Label>
                   <Select
                     value={formData.contentFilter}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, contentFilter: value as any }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-background-secondary border-border">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -451,7 +483,7 @@ export default function Profile() {
                       <SelectItem value="mature">🔞 Maduro - Incluye contenido para adultos</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-foreground-tertiary mt-2">
                     Controla qué tipo de contenido anime y manga se muestra
                   </p>
                 </div>
@@ -468,20 +500,20 @@ export default function Profile() {
 
           {/* Idioma Tab */}
           <TabsContent value="language">
-            <GlassCard className="p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Globe className="w-5 h-5" />
+            <GlassCard className="p-6 bg-background-elevated border-0 shadow-md">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
+                <Globe className="w-5 h-5 text-primary" />
                 Configuración de Idioma
               </h3>
               
               <div className="space-y-6">
                 <div>
-                  <Label className="text-sm font-medium mb-3 block">Idioma de la Interfaz</Label>
+                  <Label className="text-sm font-medium mb-3 block text-foreground">Idioma de la Interfaz</Label>
                   <Select
                     value={formData.language}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, language: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-background-secondary border-border">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -490,7 +522,7 @@ export default function Profile() {
                       <SelectItem value="ja">🇯🇵 日本語</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-foreground-tertiary mt-2">
                     Idioma principal de la aplicación
                   </p>
                 </div>

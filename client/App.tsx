@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Navigation } from "./components/navigation";
 import { ScrollProgress } from "./components/ui/scroll-progress";
 import { NetworkStatusNotification } from "./components/ui/network-status";
@@ -16,23 +16,11 @@ import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
 
 function App() {
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem("theme");
-    return saved ? saved === "dark" : false;
-  });
-
+  // Force dark mode always
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  }, [isDark]);
-
-  const handleThemeToggle = () => {
-    setIsDark(!isDark);
-  };
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("theme", "dark");
+  }, []);
 
   const handleSearch = (query: string) => {
     // TODO: Implement global search functionality
@@ -42,11 +30,9 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background">
+        <div className="min-h-screen bg-background">
           <Navigation
             onSearch={handleSearch}
-            isDark={isDark}
-            onThemeToggle={handleThemeToggle}
           />
           <ScrollProgress />
 

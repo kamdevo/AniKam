@@ -4,8 +4,6 @@ import {
   Library,
   Compass,
   Home,
-  Moon,
-  Sun,
   Menu,
   User,
 } from "lucide-react";
@@ -19,14 +17,10 @@ import { useState } from "react";
 import NavLogo from "../assets/logo.png";
 interface NavigationProps {
   onSearch?: (query: string) => void;
-  isDark?: boolean;
-  onThemeToggle?: () => void;
 }
 
 export function Navigation({
   onSearch,
-  isDark,
-  onThemeToggle,
 }: NavigationProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -61,10 +55,10 @@ export function Navigation({
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-8 h-8 bg-anime-gradient rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
               <img src={NavLogo} alt="AniKam Logo" />
             </div>
-            <span className="gradient-text font-bold text-xl">AniKam</span>
+            <span className="text-primary font-bold text-xl">AniKam</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -96,13 +90,13 @@ export function Navigation({
                   placeholder="Search anime, manga..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-glass/50 border-glass-border/50 focus:bg-glass/80 transition-all"
+                  className="pl-10 bg-glass/50 border-0 focus:bg-glass/80 transition-all"
                 />
               </div>
             </form>
           </div>
 
-          {/* Theme Toggle, Auth & Mobile Menu */}
+          {/* Auth & Mobile Menu */}
           <div className="flex items-center space-x-2">
             {/* Login/Profile Button */}
             {!isAuthenticated ? (
@@ -110,7 +104,7 @@ export function Navigation({
                 variant="outline"
                 size="sm"
                 onClick={() => setIsAuthModalOpen(true)}
-                className="hidden md:flex border-primary/20 hover:bg-primary/5"
+                className="hidden md:flex border-0 hover:bg-primary/5"
               >
                 <User className="w-4 h-4 mr-2" />
                 Sign In
@@ -120,19 +114,6 @@ export function Navigation({
                 <UserProfile />
               </div>
             )}
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onThemeToggle}
-              className="w-9 h-9 p-0 hover:bg-white/10"
-            >
-              {isDark ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
-            </Button>
 
             <Button
               variant="ghost"
@@ -157,7 +138,7 @@ export function Navigation({
                   placeholder="Search anime, manga..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-glass/50 border-glass-border/50 focus:bg-glass/80"
+                  className="pl-10 bg-glass/50 border-0 focus:bg-glass/80"
                 />
               </div>
             </form>
@@ -187,15 +168,15 @@ export function Navigation({
                   setIsAuthModalOpen(true);
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full bg-anime-gradient hover:opacity-90 text-white"
+                className="w-full bg-primary hover:bg-primary/90 text-white"
               >
                 <User className="w-5 h-5 mr-2" />
                 Sign In
               </Button>
             ) : (
-              <div className="px-4 py-3 border-t border-glass-border/50 mt-4">
+              <div className="px-4 py-3 border-t border-0 mt-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-anime-gradient rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
                     <span className="text-white font-bold">
                       {user?.avatar || user?.username?.[0]?.toUpperCase()}
                     </span>
